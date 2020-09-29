@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "582828132277",
+    "firebase_url": "https://group-to-do-60b97.firebaseio.com",
+    "project_id": "group-to-do-60b97",
+    "storage_bucket": "group-to-do-60b97.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:582828132277:android:50fee90bef5b2d1655bbfc",
+        "android_client_info": {
+          "package_name": "com.hanabi.todoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "582828132277-e8it4t6h9saog4r8pg3e58iith6bb95q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmwuTyl2wiW4IhWhATw1fB3i026oEsx9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "582828132277-e8it4t6h9saog4r8pg3e58iith6bb95q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
