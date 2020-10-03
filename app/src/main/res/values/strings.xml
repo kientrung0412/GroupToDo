@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">TodoApp</string>
+    <string name="login_google">Đăng nhập bằng google</string>
+    <string name="login_facebook">Đăng nhập bằng facebook</string>
+    <string name="rules"><u>Điều khoản</u></string>
+    <string name="and"> và </string>
+    <string name="privacy_policy"><u>chính sách bảo mật</u></string>
+    <string name="title_login">Group to-do xin chào bạn</string>
+    <string name="search">Search</string>
+    <string name="navigaton_content_open">open</string>
+    <string name="navigaton_content_close">close</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
