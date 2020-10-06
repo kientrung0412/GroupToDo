@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.adapter.RoomChatAdapter;
+import com.hanabi.todoapp.models.Message;
 import com.hanabi.todoapp.models.RoomChat;
 
 import java.util.Arrays;
@@ -45,14 +46,19 @@ public class RoomChatFragment extends Fragment {
     }
 
     private void loadingAdapter() {
+        RoomChat roomChat = new RoomChat();
+        roomChat.setUserIds(Arrays.asList(user.getUid(), "263bgy1v3h1h3uiy89bsdas"));
+
         CollectionReference collection = db.collection("room_chat");
-        collection.whereArrayContains("userIds", user.getUid()).get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        List<RoomChat> roomChats = queryDocumentSnapshots.toObjects(RoomChat.class);
-                    }
-                });
+        collection.document().set(roomChat);
+
+//        collection.whereArrayContains("userIds", user.getUid()).get()
+//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                        List<RoomChat> roomChats = queryDocumentSnapshots.toObjects(RoomChat.class);
+//                    }
+//                });
 
     }
 }

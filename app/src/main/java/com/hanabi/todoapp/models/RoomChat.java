@@ -2,11 +2,12 @@ package com.hanabi.todoapp.models;
 
 import java.util.List;
 
-public class RoomChat  {
+public class RoomChat {
 
     private String roomId;
     private List<String> userIds;
     private List<Message> messages;
+    private Boolean isGroup = false;
 
     public String getRoomId() {
         return roomId;
@@ -30,5 +31,13 @@ public class RoomChat  {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+    }
+
+    public Boolean getGroup() {
+        return isGroup;
+    }
+
+    public void setGroup(Boolean group) {
+        isGroup = group;
     }
 }
