@@ -13,13 +13,18 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -30,11 +35,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SearchView searchView;
     private LinearLayout lnNavHeader;
     private FloatingActionButton fabAdd;
-    private FrameLayout frameLayout;
-
+    private TextView tvEmail, tvName;
+    private CircleImageView civAvatar;
+    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     private ToDoFragment toDoFragment = new ToDoFragment();
-    private ChatFragment chatFragment = new ChatFragment();
+    private RoomChatFragment roomChatFragment = new RoomChatFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +55,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationViewl = findViewById(R.id.nav_view);
         lnNavHeader = navigationViewl.getHeaderView(0).findViewById(R.id.ln_nav_header);
         fabAdd = findViewById(R.id.fab_add);
+        tvEmail = lnNavHeader.findViewById(R.id.tv_email);
+        tvName = lnNavHeader.findViewById(R.id.tv_name);
+        civAvatar = lnNavHeader.findViewById(R.id.civ_avatar);
+
+        tvEmail.setText(firebaseUser.getEmail());
+        tvName.setText(firebaseUser.getDisplayName());
+        Glide.with(civAvatar).load(firebaseUser.getPhotoUrl()).into(civAvatar);
 
         navigationViewl.setNavigationItemSelectedListener(this);
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_baseline_more_vert_24, null));
         toolbar.setNavigationIcon(R.drawable.ic_baseline_menu_24);
+        toolbar.setOutlineAmbientShadowColor(getColor(R.color.colorWhite));
         lnNavHeader.setOnClickListener(this);
         fabAdd.setOnClickListener(this);
         setSupportActionBar(toolbar);
@@ -64,14 +78,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void initFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fl_main, toDoFragment);
-        transaction.add(R.id.fl_main, chatFragment);
+        transaction.add(R.id.fl_main, roomChatFragment);
         transaction.commit();
     }
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.hide(toDoFragment);
-        transaction.hide(chatFragment);
+        transaction.hide(roomChatFragment);
         transaction.show(fragment);
         transaction.commit();
     }
@@ -117,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 showFragment(toDoFragment);
                 break;
             case R.id.it_chat:
-                showFragment(chatFragment);
+                showFragment(roomChatFragment);
                 break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);

@@ -30,7 +30,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
     private LoadingDialog loadingDialog = new LoadingDialog(this);
-    public static final String EXTRA_USER = "extra.USER";
 
     @Override
     public void onStart() {
@@ -38,7 +37,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             loadingDialog.startLoadingdialog();
-            updateUI(user);
+            updateUI();
         }
     }
 
@@ -100,9 +99,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void updateUI(FirebaseUser currentUser) {
+    private void updateUI() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(LoginActivity.EXTRA_USER, currentUser);
         startActivity(intent);
         finish();
     }
@@ -114,8 +112,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            updateUI();
                         } else {
                             loadingDialog.dismissLoadingDialog();
                             Toast.makeText(LoginActivity.this, getString(R.string.fall_login_google), Toast.LENGTH_SHORT).show();
