@@ -1,9 +1,12 @@
 package com.hanabi.todoapp.adapter;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +24,7 @@ import java.util.Date;
 
 public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTodo> {
 
+    public static final String TAG = MyTodoAdapter.class.getName();
     private LayoutInflater layoutInflater;
     private ArrayList<Todo> data;
     private OnClickMyTodoListener listener;
@@ -38,6 +42,15 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         notifyDataSetChanged();
     }
 
+    public ArrayList<Todo> getData() {
+        return data;
+    }
+
+    public void addData(Todo todo) {
+        data.add(todo);
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public HolderMyTodo onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -50,6 +63,13 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         final Todo todo = data.get(position);
         holder.bindView(todo);
         if (listener != null) {
+            holder.getCbDone().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    listener.onChangeCheckbox(todo, compoundButton);
+                }
+            });
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -72,14 +92,16 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
     }
 
 
-    public class HolderMyTodo extends RecyclerView.ViewHolder {
+    public class HolderMyTodo extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener {
 
         private TextView tvContent, tvTime;
+        private CheckBox cbDone;
 
         public HolderMyTodo(@NonNull View itemView) {
             super(itemView);
             tvContent = itemView.findViewById(R.id.tv_content_todo);
             tvTime = itemView.findViewById(R.id.tv_todo_create_at);
+            cbDone = itemView.findViewById(R.id.cb_done);
         }
 
         private void bindView(Todo todo) {
@@ -88,12 +110,23 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
             String dateStr = dateFormat.format(todo.getId());
             tvTime.setText(dateStr);
         }
+
+        public CheckBox getCbDone() {
+            return cbDone;
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+        }
     }
 
     public interface OnClickMyTodoListener {
         void onClickMyTodo(Todo todo);
 
         void onClickLongMyTodo(Todo todo);
+
+        void onChangeCheckbox(Todo todo, CompoundButton compoundButton);
     }
 
 }

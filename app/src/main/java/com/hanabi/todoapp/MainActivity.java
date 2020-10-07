@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tvName = lnNavHeader.findViewById(R.id.tv_name);
         civAvatar = lnNavHeader.findViewById(R.id.civ_avatar);
 
+        toolbar.setTitle("Hôm nay");
         tvEmail.setText(firebaseUser.getEmail());
         tvName.setText(firebaseUser.getDisplayName());
         Glide.with(civAvatar).load(firebaseUser.getPhotoUrl()).into(civAvatar);
@@ -152,5 +153,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 break;
         }
+    }
+
+    public void setTitleToolbar(String title) {
+        toolbar.setTitle(title);
     }
 }

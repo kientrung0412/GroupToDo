@@ -2,9 +2,11 @@ package com.hanabi.todoapp.dialog;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,12 +24,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.hanabi.todoapp.R;
 import com.hanabi.todoapp.models.Todo;
 
-public class CreateMyToDialog implements View.OnClickListener {
+public class CreateMyToDialog implements View.OnClickListener, DialogInterface.OnDismissListener {
 
     private ImageView imgAdd;
     private EditText edtContent;
     private Activity activity;
     private AlertDialog dialog;
+    private InputMethodManager imm;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -38,6 +41,8 @@ public class CreateMyToDialog implements View.OnClickListener {
     }
 
     private void initViews() {
+        imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
         View view = activity.getLayoutInflater().inflate(R.layout.form_add_my_todo, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         edtContent = view.findViewById(R.id.edt_content);
@@ -46,17 +51,20 @@ public class CreateMyToDialog implements View.OnClickListener {
         imgAdd.setOnClickListener(this);
         builder.setView(view);
         dialog = builder.create();
+        dialog.setOnDismissListener(this);
     }
 
     public void show() {
         dialog.show();
         edtContent.requestFocus();
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     private void dismiss() {
         dialog.dismiss();
         edtContent.setText("");
         edtContent.clearFocus();
+        imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
     }
 
     @Override
@@ -83,7 +91,7 @@ public class CreateMyToDialog implements View.OnClickListener {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-
+                        dismiss();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -96,4 +104,8 @@ public class CreateMyToDialog implements View.OnClickListener {
                 });
     }
 
+    @Override
+    public void onDismiss(DialogInterface dialogInterface) {
+        dismiss();
+    }
 }
