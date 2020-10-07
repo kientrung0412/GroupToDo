@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ln_add_my_todo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_todo"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Thêm công việc"
+        android:textColor="@color/colorBlack"
+        android:textSize="21sp"
+        android:textStyle="bold" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginBottom="8dp">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="4dp"
+            android:backgroundTint="@color/colorBlue"
+            app:cardCornerRadius="100dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="4dp"
+            android:backgroundTint="@color/colorDanger"
+            app:cardCornerRadius="100dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="4dp"
+            android:backgroundTint="@color/colorYellow"
+            app:cardCornerRadius="100dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="4dp"
+            android:backgroundTint="@color/colorGreen"
+            app:cardCornerRadius="100dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="4dp"
+            android:backgroundTint="@color/colorViolet"
+            app:cardCornerRadius="100dp" />
+
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/edt_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="8dp"
+        android:background="@drawable/btn_bg_default"
+        android:focusedByDefault="true"
+        android:hint="Công việc"
+        android:imeOptions="actionSend"
+        android:inputType="textMultiLine"
+        android:lineHeight="21sp"
+        android:padding="8dp"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="16dp">
+
+        <ImageView
+            android:id="@+id/iv_add_my_todo"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_send_24" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

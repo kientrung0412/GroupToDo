@@ -23,6 +23,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.hanabi.todoapp.dialog.CreateMyToDialog;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ToDoFragment toDoFragment = new ToDoFragment();
     private RoomChatFragment roomChatFragment = new RoomChatFragment();
 
+    private CreateMyToDialog createMyToDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,11 +53,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initViews() {
+        createMyToDialog = new CreateMyToDialog(this);
         toolbar = findViewById(R.id.tb_main);
         drawerLayout = findViewById(R.id.dl_main);
         navigationViewl = findViewById(R.id.nav_view);
         lnNavHeader = navigationViewl.getHeaderView(0).findViewById(R.id.ln_nav_header);
-        fabAdd = findViewById(R.id.fab_add);
+        fabAdd = findViewById(R.id.fab_add_todo);
         tvEmail = lnNavHeader.findViewById(R.id.tv_email);
         tvName = lnNavHeader.findViewById(R.id.tv_name);
         civAvatar = lnNavHeader.findViewById(R.id.civ_avatar);
@@ -66,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationViewl.setNavigationItemSelectedListener(this);
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_baseline_more_vert_24, null));
         toolbar.setNavigationIcon(R.drawable.ic_baseline_menu_24);
-        toolbar.setOutlineAmbientShadowColor(getColor(R.color.colorWhite));
         lnNavHeader.setOnClickListener(this);
         fabAdd.setOnClickListener(this);
         setSupportActionBar(toolbar);
@@ -142,8 +145,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.fab_add:
-
+            case R.id.fab_add_todo:
+                createMyToDialog.show();
                 break;
             case R.id.ln_nav_header:
 

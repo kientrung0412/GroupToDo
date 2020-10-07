@@ -20,9 +20,9 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/tb_main"
-                style="@style/AppTheme.Toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:theme="@style/AppTheme.Toolbar"
                 app:menu="@menu/top_app_bar"
                 app:navigationIcon="@drawable/ic_baseline_menu_24"
                 app:title="Demo"
@@ -37,7 +37,7 @@
             android:layout_below="@+id/abl_main" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add"
+            android:id="@+id/fab_add_todo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

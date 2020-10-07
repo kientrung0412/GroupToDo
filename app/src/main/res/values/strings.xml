@@ -16,4 +16,5 @@
     <!--    login activity-->
     <string name="error_login_google">Đăng nhập thất bại, mã lỗi </string>
     <string name="fall_login_google">Đăng nhập thất bại </string>
+    <string name="add_todo">Thêm</string>
 </resources>
