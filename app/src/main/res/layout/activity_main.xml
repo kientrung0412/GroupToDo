@@ -36,15 +36,6 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/abl_main" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_add_todo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="32dp"
-            app:backgroundTint="@color/colorPrimary"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
 
     </RelativeLayout>
 

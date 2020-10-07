@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,6 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.adapter.MyTodoAdapter;
+import com.hanabi.todoapp.dialog.CreateMyToDialog;
 import com.hanabi.todoapp.models.Todo;
 
 import java.util.ArrayList;
@@ -41,15 +44,14 @@ import java.util.Arrays;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener {
-
-    public static final String TAG = "MyToDoFragment";
+public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     private RecyclerView rcvMyTodos;
     private MyTodoAdapter adapter;
-    private Button btnAdd;
-    private EditText edtContent;
-    private Boolean status;
+    private SwipeRefreshLayout srlReload;
+    private FloatingActionButton fabAdd;
+
+    private CreateMyToDialog createMyToDialog;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -64,10 +66,18 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        createMyToDialog = new CreateMyToDialog(getActivity());
+
         rcvMyTodos = getActivity().findViewById(R.id.rcv_my_todo);
+        srlReload = getActivity().findViewById(R.id.srl_loading_my_todo);
+        fabAdd = getActivity().findViewById(R.id.fab_add_todo);
+
 
         adapter = new MyTodoAdapter(getLayoutInflater());
         adapter.setListener(this);
+        srlReload.setOnRefreshListener(this);
+        fabAdd.setOnClickListener(this);
+        srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
         rcvMyTodos.setAdapter(adapter);
         new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvMyTodos);
 
@@ -86,30 +96,12 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                             Toast.makeText(getActivity(), "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                             return;
                         }
-
-
-//                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-//                            switch (dc.getType()) {
-//                                case ADDED:
-//                                    Log.d(TAG, "ADDED" + dc.getDocument().getData());
-//                                    break;
-//                                case MODIFIED:
-//                                    Log.d(TAG, "MODIFIED" + dc.getDocument().getData());
-//                                    break;
-//                                case REMOVED:
-//                                    Log.d(TAG, "REMOVED" + dc.getDocument().getData());
-//                                    break;
-//                            }
-//                        }
-
                         loadingData();
-
                     }
                 });
     }
 
     private void loadingData() {
-        final ArrayList<Todo> todos = new ArrayList<>();
         db.collection(Todo.TODO_COLL).document(user.getUid())
                 .collection(Todo.TODO_COLL_MY_TODO)
                 .whereEqualTo("status", Todo.TODO_STATUS_NEW)
@@ -118,6 +110,11 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        ArrayList<Todo> todos = new ArrayList<>();
+                        if (queryDocumentSnapshots.isEmpty()) {
+                            adapter.setData(todos);
+                            return;
+                        }
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                             Todo todo = document.toObject(Todo.class);
                             todos.add(todo);
@@ -209,7 +206,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 
     @Override
     public void onClickMyTodo(final Todo todo) {
-
+        createMyToDialog.updateTodoDialog(todo);
     }
 
     @Override
@@ -228,5 +225,20 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
             }
         }).show();
         compoundButton.setChecked(false);
+    }
+
+    @Override
+    public void onRefresh() {
+        loadingData();
+        srlReload.setRefreshing(false);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.fab_add_todo:
+                createMyToDialog.show();
+                break;
+        }
     }
 }
