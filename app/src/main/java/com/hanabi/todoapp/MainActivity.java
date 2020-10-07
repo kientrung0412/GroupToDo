@@ -19,11 +19,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.hanabi.todoapp.dialog.CreateMyToDialog;
+import com.hanabi.todoapp.dao.Database;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -38,9 +35,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private TextView tvEmail, tvName;
     private CircleImageView civAvatar;
-    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-    private ToDoFragment toDoFragment = new ToDoFragment();
+    private MyToDoFragment myToDoFragment = new MyToDoFragment();
+    private GroupToDoFragment groupToDoFragment = new GroupToDoFragment();
     private RoomChatFragment roomChatFragment = new RoomChatFragment();
 
 
@@ -60,10 +57,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tvName = lnNavHeader.findViewById(R.id.tv_name);
         civAvatar = lnNavHeader.findViewById(R.id.civ_avatar);
 
-        toolbar.setTitle("Hôm nay");
-        tvEmail.setText(firebaseUser.getEmail());
-        tvName.setText(firebaseUser.getDisplayName());
-        Glide.with(civAvatar).load(firebaseUser.getPhotoUrl()).into(civAvatar);
+        tvEmail.setText(Database.getFirebaseUser().getEmail());
+        tvName.setText(Database.getFirebaseUser().getDisplayName());
+        Glide.with(civAvatar).load(Database.getFirebaseUser().getPhotoUrl()).into(civAvatar);
 
         navigationViewl.setNavigationItemSelectedListener(this);
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_baseline_more_vert_24, null));
@@ -72,21 +68,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         setupDrawer();
         initFragment();
-        showFragment(toDoFragment);
+        showFragment(myToDoFragment);
     }
 
     private void initFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.fl_main, toDoFragment);
+        transaction.add(R.id.fl_main, myToDoFragment);
         transaction.add(R.id.fl_main, roomChatFragment);
+
         transaction.commit();
     }
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.hide(toDoFragment);
+        transaction.hide(myToDoFragment);
         transaction.hide(roomChatFragment);
         transaction.show(fragment);
+//        transaction.replace(R.id.fl_main, fragment);
         transaction.commit();
     }
 
@@ -105,10 +103,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onBackPressed();
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.top_app_bar, menu);
-        searchView = (SearchView) menu.findItem(R.id.it_search).getActionView();
+//        getMenuInflater().inflate(R.menu.top_app_bar, menu);
+//        searchView = (SearchView) menu.findItem(R.id.it_search).getActionView();
+//        setupSearchBar();
+        return true;
+    }
+
+    private void setupSearchBar() {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -120,15 +124,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         });
-        return true;
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.it_todo:
-            default:
-                showFragment(toDoFragment);
+            case R.id.it_my_todo:
+                showFragment(myToDoFragment);
+                break;
+            case R.id.it_group_todo:
+                showFragment(groupToDoFragment);
                 break;
             case R.id.it_chat:
                 showFragment(roomChatFragment);
@@ -146,9 +151,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 break;
         }
-    }
-
-    public void setTitleToolbar(String title) {
-        toolbar.setTitle(title);
     }
 }

@@ -3,19 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/it_todo"
-            android:icon="@drawable/ic_work"
-            android:title="@string/todo" />
-        <item
-            android:id="@+id/it_chat"
-            android:icon="@drawable/ic_chat"
-            android:title="@string/message" />
 
-        <item android:title="@string/app_name" />
-        <item android:title="@string/app_name" />
-    </group>
+    <item android:title="@string/todo">
+        <menu>
+            <item
+                android:id="@+id/it_my_todo"
+                android:icon="@drawable/ic_work"
+                android:title="@string/my_todo" />
+
+            <item
+                android:id="@+id/it_group_todo"
+                android:title="@string/group_todo" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/it_chat"
+        android:icon="@drawable/ic_chat"
+        android:title="@string/message" />
+
+    <item android:title="@string/app_name" />
+    <item android:title="@string/app_name" />
 
 
     <item android:title="Demo">
@@ -23,21 +31,6 @@
             <item android:title="@string/app_name" />
             <item android:title="@string/app_name" />
             <item android:title="@string/app_name" />
-        </menu>
-    </item>
-
-    <item
-        android:id="@+id/firstOne"
-        android:orderInCategory="1"
-        android:title="First One"
-        app:showAsAction="ifRoom">
-        <menu>
-            <item
-                android:id="@+id/menuSortNewest"
-                android:title="1-1" />
-            <item
-                android:id="@+id/menuSortRating"
-                android:title="1-2" />
         </menu>
     </item>
 </menu>

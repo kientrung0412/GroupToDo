@@ -1,7 +1,6 @@
 package com.hanabi.todoapp;
 
 import android.graphics.Canvas;
-import android.nfc.Tag;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,39 +11,36 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.adapter.MyTodoAdapter;
+import com.hanabi.todoapp.dao.Database;
 import com.hanabi.todoapp.dialog.CreateMyToDialog;
 import com.hanabi.todoapp.models.Todo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
+public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, CreateMyToDialog.clickButtonListener {
 
     private RecyclerView rcvMyTodos;
     private MyTodoAdapter adapter;
@@ -53,9 +49,8 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 
     private CreateMyToDialog createMyToDialog;
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
+    private CollectionReference reference = Database.getDb().collection(Todo.TODO_COLL)
+            .document(Database.getFirebaseUser().getUid()).collection(Todo.TODO_COLL_MY_TODO);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,13 +61,14 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
         createMyToDialog = new CreateMyToDialog(getActivity());
 
         rcvMyTodos = getActivity().findViewById(R.id.rcv_my_todo);
         srlReload = getActivity().findViewById(R.id.srl_loading_my_todo);
-        fabAdd = getActivity().findViewById(R.id.fab_add_todo);
+        fabAdd = getActivity().findViewById(R.id.fab_add_my_todo);
 
-
+        createMyToDialog.setListener(this);
         adapter = new MyTodoAdapter(getLayoutInflater());
         adapter.setListener(this);
         srlReload.setOnRefreshListener(this);
@@ -87,24 +83,20 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 
     private void updateData() {
 
-        db.collection(Todo.TODO_COLL).document(user.getUid())
-                .collection(Todo.TODO_COLL_MY_TODO)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Toast.makeText(getActivity(), "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        loadingData();
-                    }
-                });
+        reference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Toast.makeText(getActivity(), "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                loadingData();
+            }
+        });
     }
 
     private void loadingData() {
-        db.collection(Todo.TODO_COLL).document(user.getUid())
-                .collection(Todo.TODO_COLL_MY_TODO)
-                .whereEqualTo("status", Todo.TODO_STATUS_NEW)
+        reference.whereEqualTo("status", Todo.TODO_STATUS_NEW)
                 .orderBy("id", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -131,9 +123,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     private void updateTodo(Todo todo) {
-        db.collection(Todo.TODO_COLL).document(user.getUid())
-                .collection(Todo.TODO_COLL_MY_TODO)
-                .document(todo.getId() + "")
+        reference.document(todo.getId() + "")
                 .set(todo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -215,15 +205,31 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.fab_add_my_todo:
+                createMyToDialog.show();
+                break;
+        }
+    }
+
+    @Override
+    public void onClickButtonSend(Todo todo) {
+        todo.setStatus(Todo.TODO_STATUS_NEW);
+        updateTodo(todo);
+    }
+
+    @Override
     public void onChangeCheckbox(final Todo todo, final CompoundButton compoundButton) {
         doneTodo(todo);
-        Snackbar.make(getView(), "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                todo.setStatus(Todo.TODO_STATUS_NEW);
-                updateTodo(todo);
-            }
-        }).show();
+        Snackbar.make(getView(), "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        todo.setStatus(Todo.TODO_STATUS_NEW);
+                        updateTodo(todo);
+                    }
+                }).show();
         compoundButton.setChecked(false);
     }
 
@@ -234,11 +240,13 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fab_add_todo:
-                createMyToDialog.show();
-                break;
-        }
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_my_todo, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return true;
     }
 }

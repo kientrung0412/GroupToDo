@@ -7,16 +7,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.hanabi.todoapp.R;
 import com.hanabi.todoapp.models.Todo;
 
@@ -28,8 +21,7 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
     private AlertDialog dialog;
     private InputMethodManager imm;
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    private clickButtonListener listener;
 
     private Todo todo = null;
 
@@ -82,37 +74,25 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
                     this.todo = new Todo();
                 }
                 todo.setContent(edtContent.getText().toString());
-                updateDatabase();
+                listener.onClickButtonSend(todo);
+                todo = null;
                 break;
         }
 
         dismiss();
     }
 
-    public void updateDatabase() {
-        todo.setStatus(Todo.TODO_STATUS_NEW);
-        db.collection(Todo.TODO_COLL).document(firebaseUser.getUid())
-                .collection(Todo.TODO_COLL_MY_TODO).document(Long.toString(todo.getId()))
-                .set(todo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        dismiss();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(activity, "Có lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        dismiss();
-
-                    }
-                });
-        todo = null;
+    public void setListener(clickButtonListener listener) {
+        this.listener = listener;
     }
 
     @Override
     public void onDismiss(DialogInterface dialogInterface) {
         dismiss();
+    }
+
+
+    public interface clickButtonListener {
+        void onClickButtonSend(Todo todo);
     }
 }

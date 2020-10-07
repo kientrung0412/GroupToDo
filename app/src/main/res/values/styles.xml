@@ -13,4 +13,9 @@
         <item name="android:textColorSecondary">@color/colorWhite</item>
     </style>
 
+    <style name="Theme.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="background">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/colorWhite</item>
+
+    </style>
 </resources>

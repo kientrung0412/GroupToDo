@@ -8,9 +8,7 @@
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always" />
-    <item
-        android:textColor="@color/colorBlack"
-        android:title="Demo" />
+    <item android:title="Demo" />
     <item android:title="Demo" />
     <item android:title="Demo" />
 </menu>
