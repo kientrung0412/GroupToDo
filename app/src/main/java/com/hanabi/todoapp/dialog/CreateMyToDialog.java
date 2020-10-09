@@ -56,11 +56,11 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
-    private void dismiss() {
+    public void dismiss() {
         dialog.dismiss();
         edtContent.setText("");
         edtContent.clearFocus();
-        imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
+        imm.toggleSoftInput(InputMethodManager.HIDE_NOT_ALWAYS, 0);
     }
 
     @Override
@@ -78,8 +78,6 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
                 todo = null;
                 break;
         }
-
-        dismiss();
     }
 
     public void setListener(clickButtonListener listener) {

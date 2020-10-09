@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.CollectionReference;
@@ -40,17 +41,57 @@ import java.util.ArrayList;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, CreateMyToDialog.clickButtonListener {
+public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, CreateMyToDialog.clickButtonListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView rcvMyTodos;
     private MyTodoAdapter adapter;
     private SwipeRefreshLayout srlReload;
     private FloatingActionButton fabAdd;
+    private BottomNavigationView bottomNavigationView;
+
 
     private CreateMyToDialog createMyToDialog;
 
     private CollectionReference reference = Database.getDb().collection(Todo.TODO_COLL)
             .document(Database.getFirebaseUser().getUid()).collection(Todo.TODO_COLL_MY_TODO);
+
+    private ItemTouchHelper.SimpleCallback simpleCallbackDelete =
+            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                @Override
+                public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                    return false;
+                }
+
+                @Override
+                public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                    Todo todo = adapter.getData().get(viewHolder.getAdapterPosition());
+                    switch (direction) {
+                        case ItemTouchHelper.LEFT:
+                            dissTodo(todo);
+                            break;
+                        case ItemTouchHelper.RIGHT:
+                            fallTodo(todo);
+                            break;
+                    }
+                }
+
+                @Override
+                public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                        float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                    new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                            .addSwipeLeftActionIcon(R.drawable.ic_delete)
+                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorDanger))
+                            .addSwipeLeftLabel("Xóa bỏ")
+                            .setSwipeLeftLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
+                            .addSwipeRightActionIcon(R.drawable.ic_diss)
+                            .addSwipeRightBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorYellow))
+                            .addSwipeRightLabel("Không hoàn thành")
+                            .setSwipeRightLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
+                            .create()
+                            .decorate();
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+            };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,6 +105,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         setHasOptionsMenu(true);
         createMyToDialog = new CreateMyToDialog(getActivity());
 
+        bottomNavigationView = getActivity().findViewById(R.id.bnav_my_todo);
         rcvMyTodos = getActivity().findViewById(R.id.rcv_my_todo);
         srlReload = getActivity().findViewById(R.id.srl_loading_my_todo);
         fabAdd = getActivity().findViewById(R.id.fab_add_my_todo);
@@ -76,6 +118,8 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
         rcvMyTodos.setAdapter(adapter);
         new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvMyTodos);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
         loadingData();
         updateData();
@@ -122,13 +166,12 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 });
     }
 
-    private void updateTodo(Todo todo) {
+    private void updateTodo(final Todo todo) {
         reference.document(todo.getId() + "")
                 .set(todo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -139,64 +182,50 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 });
     }
 
-    private void dissTodo(Todo todo) {
+    private void dissTodo(final Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_DISABLED);
         updateTodo(todo);
+        Snackbar.make(rcvMyTodos, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        todo.setStatus(Todo.TODO_STATUS_NEW);
+                        updateTodo(todo);
+                    }
+                }).show();
     }
 
-    private void fallTodo(Todo todo) {
+    private void fallTodo(final Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_FAILED);
         updateTodo(todo);
+        Snackbar.make(rcvMyTodos, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        todo.setStatus(Todo.TODO_STATUS_NEW);
+                        updateTodo(todo);
+                    }
+                }).show();
     }
 
-    private void doneTodo(Todo todo) {
+    private void doneTodo(final Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_DONE);
         updateTodo(todo);
-    }
-
-
-    ItemTouchHelper.SimpleCallback simpleCallbackDelete =
-            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-                @Override
-                public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                    return false;
-                }
-
-                @Override
-                public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                    Todo todo = adapter.getData().get(viewHolder.getAdapterPosition());
-                    switch (direction) {
-                        case ItemTouchHelper.LEFT:
-                            dissTodo(todo);
-                            break;
-                        case ItemTouchHelper.RIGHT:
-                            fallTodo(todo);
-                            break;
+        Snackbar.make(rcvMyTodos, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        todo.setStatus(Todo.TODO_STATUS_NEW);
+                        updateTodo(todo);
                     }
-                }
-
-                @Override
-                public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
-                                        float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                    new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                            .addSwipeLeftActionIcon(R.drawable.ic_delete)
-                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorDanger))
-                            .addSwipeLeftLabel("Xóa bỏ")
-                            .setSwipeLeftLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
-                            .addSwipeRightActionIcon(R.drawable.ic_diss)
-                            .addSwipeRightBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorYellow))
-                            .addSwipeRightLabel("Không hoàn thành")
-                            .setSwipeRightLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
-                            .create()
-                            .decorate();
-                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-                }
-            };
-
+                }).show();
+    }
 
     @Override
     public void onClickMyTodo(final Todo todo) {
-        createMyToDialog.updateTodoDialog(todo);
+        if (todo.getStatus() == Todo.TODO_STATUS_NEW) {
+            createMyToDialog.updateTodoDialog(todo);
+        }
     }
 
     @Override
@@ -217,19 +246,12 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     public void onClickButtonSend(Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_NEW);
         updateTodo(todo);
+        createMyToDialog.dismiss();
     }
 
     @Override
     public void onChangeCheckbox(final Todo todo, final CompoundButton compoundButton) {
         doneTodo(todo);
-        Snackbar.make(getView(), "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        todo.setStatus(Todo.TODO_STATUS_NEW);
-                        updateTodo(todo);
-                    }
-                }).show();
         compoundButton.setChecked(false);
     }
 
@@ -247,6 +269,14 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return true;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+
+        }
         return true;
     }
 }

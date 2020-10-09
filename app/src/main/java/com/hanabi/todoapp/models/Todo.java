@@ -9,10 +9,9 @@ public class Todo {
     public static final int TODO_STATUS_DONE = 2;
     public static final int TODO_STATUS_DISABLED = -1;
 
-    public static final String TODO_COLL_MY_TODO = "MyTodo";
-    public static final String TODO_COLL_GROUP_TODO = "GroupTodo";
-    public static final String TODO_COLL = "Todo";
-
+    public static final String TODO_COLL_MY_TODO = "my_todo";
+    public static final String TODO_COLL_GROUP_TODO = "group_todo";
+    public static final String TODO_COLL = "todo";
 
     private long id = System.currentTimeMillis();
     private String content;

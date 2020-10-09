@@ -19,4 +19,7 @@
     <string name="add_todo">Thêm</string>
     <string name="my_todo">Công việc của tôi</string>
     <string name="group_todo">Công việc nhóm</string>
+    <string name="menu_todo_done">Hoàn thành</string>
+    <string name="menu_todo_new">Mới</string>
+    <string name="menu_todo_fall">Thất bại</string>
 </resources>

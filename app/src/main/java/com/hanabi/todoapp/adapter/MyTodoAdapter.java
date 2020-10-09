@@ -109,6 +109,9 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
             String dateStr = dateFormat.format(todo.getId());
             tvTime.setText(dateStr);
+            if (todo.getStatus() != Todo.TODO_STATUS_NEW){
+                cbDone.setVisibility(View.GONE);
+            }
         }
 
         public CheckBox getCbDone() {
