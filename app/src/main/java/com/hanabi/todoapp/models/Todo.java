@@ -49,4 +49,10 @@ public class Todo {
     public void setStatus(int status) {
         this.status = status;
     }
+
+    public void toEquals(Todo originalTodo) {
+        setStatus(originalTodo.getStatus());
+        setId(originalTodo.getId());
+        setContent(originalTodo.getContent());
+    }
 }

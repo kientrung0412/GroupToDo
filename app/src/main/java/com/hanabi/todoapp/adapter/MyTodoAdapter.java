@@ -1,13 +1,11 @@
 package com.hanabi.todoapp.adapter;
 
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,7 +18,6 @@ import com.hanabi.todoapp.R;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTodo> {
 
@@ -51,6 +48,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         notifyDataSetChanged();
     }
 
+
     @NonNull
     @Override
     public HolderMyTodo onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -63,10 +61,10 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         final Todo todo = data.get(position);
         holder.bindView(todo);
         if (listener != null) {
-            holder.getCbDone().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            holder.cbDone.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    listener.onChangeCheckbox(todo, compoundButton);
+                public void onClick(View view) {
+                    listener.onChangeCheckbox(todo);
                 }
             });
 
@@ -91,8 +89,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         return data == null ? 0 : data.size();
     }
 
-
-    public class HolderMyTodo extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener {
+    public class HolderMyTodo extends RecyclerView.ViewHolder {
 
         private TextView tvContent, tvTime;
         private CheckBox cbDone;
@@ -109,19 +106,17 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
             String dateStr = dateFormat.format(todo.getId());
             tvTime.setText(dateStr);
-            if (todo.getStatus() != Todo.TODO_STATUS_NEW){
-                cbDone.setVisibility(View.GONE);
+
+            switch (todo.getStatus()) {
+                case Todo.TODO_STATUS_NEW:
+                    cbDone.setChecked(false);
+                    break;
+                case Todo.TODO_STATUS_DONE:
+                    cbDone.setChecked(true);
+                    break;
             }
         }
 
-        public CheckBox getCbDone() {
-            return cbDone;
-        }
-
-        @Override
-        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-
-        }
     }
 
     public interface OnClickMyTodoListener {
@@ -129,7 +124,9 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
         void onClickLongMyTodo(Todo todo);
 
-        void onChangeCheckbox(Todo todo, CompoundButton compoundButton);
+        void onChangeCheckbox(Todo todo);
+
+        void onClickHeader();
     }
 
 }

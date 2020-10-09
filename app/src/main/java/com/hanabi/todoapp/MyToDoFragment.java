@@ -7,7 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -36,6 +38,7 @@ import com.hanabi.todoapp.dialog.CreateMyToDialog;
 import com.hanabi.todoapp.models.Todo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
@@ -43,8 +46,8 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener,
         SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, CreateMyToDialog.clickButtonListener {
 
-    private RecyclerView rcvMyTodos;
-    private MyTodoAdapter adapter;
+    private RecyclerView rcvTodoNew;
+    private MyTodoAdapter adapterNew;
     private SwipeRefreshLayout srlReload;
     private FloatingActionButton fabAdd;
 
@@ -55,7 +58,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
             .document(Database.getFirebaseUser().getUid()).collection(Todo.TODO_COLL_MY_TODO);
 
     private ItemTouchHelper.SimpleCallback simpleCallbackDelete =
-            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
                 @Override
                 public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                     return false;
@@ -63,13 +66,13 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 
                 @Override
                 public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                    Todo todo = adapter.getData().get(viewHolder.getAdapterPosition());
+                    Todo todo = adapterNew.getData().get(viewHolder.getAdapterPosition());
                     switch (direction) {
                         case ItemTouchHelper.LEFT:
                             dissTodo(todo);
                             break;
                         case ItemTouchHelper.RIGHT:
-                            fallTodo(todo);
+//                            fallTodo(todo);
                             break;
                     }
                 }
@@ -82,10 +85,10 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                             .addSwipeLeftBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorDanger))
                             .addSwipeLeftLabel("Xóa bỏ")
                             .setSwipeLeftLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
-                            .addSwipeRightActionIcon(R.drawable.ic_diss)
-                            .addSwipeRightBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorYellow))
-                            .addSwipeRightLabel("Không hoàn thành")
-                            .setSwipeRightLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
+//                            .addSwipeRightActionIcon(R.drawable.ic_diss)
+//                            .addSwipeRightBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorYellow))
+//                            .addSwipeRightLabel("Không hoàn thành")
+//                            .setSwipeRightLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
                             .create()
                             .decorate();
                     super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
@@ -104,18 +107,22 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         setHasOptionsMenu(true);
         createMyToDialog = new CreateMyToDialog(getActivity());
 
-        rcvMyTodos = getActivity().findViewById(R.id.rcv_my_todo);
+        rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new);
+
         srlReload = getActivity().findViewById(R.id.srl_loading_my_todo);
         fabAdd = getActivity().findViewById(R.id.fab_add_my_todo);
 
         createMyToDialog.setListener(this);
-        adapter = new MyTodoAdapter(getLayoutInflater());
-        adapter.setListener(this);
+        adapterNew = new MyTodoAdapter(getLayoutInflater());
+
+        adapterNew.setListener(this);
         srlReload.setOnRefreshListener(this);
         fabAdd.setOnClickListener(this);
         srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
-        rcvMyTodos.setAdapter(adapter);
-        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvMyTodos);
+        rcvTodoNew.setAdapter(adapterNew);
+
+
+        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvTodoNew);
 
         loadingData();
         updateData();
@@ -136,7 +143,11 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     private void loadingData() {
-        reference.whereEqualTo("status", Todo.TODO_STATUS_NEW)
+        getTodos(adapterNew);
+    }
+
+    private void getTodos(MyTodoAdapter adapter) {
+        reference.whereIn("status", Arrays.asList(Todo.TODO_STATUS_DONE, Todo.TODO_STATUS_NEW))
                 .orderBy("id", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -178,30 +189,36 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 });
     }
 
-    private void dissTodo(final Todo todo) {
+    private void dissTodo(Todo todo) {
+        Todo originalTodo = new Todo();
+        originalTodo.toEquals(todo);
+
         todo.setStatus(Todo.TODO_STATUS_DISABLED);
         updateTodo(todo);
-        undoTodo(todo);
+        undoTodo(originalTodo);
     }
 
-    private void fallTodo(final Todo todo) {
+    private void fallTodo(Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_FAILED);
         updateTodo(todo);
-        undoTodo(todo);
     }
 
-    private void doneTodo(final Todo todo) {
+    private void doneTodo(Todo todo) {
+        Todo originalTodo = new Todo();
+        originalTodo.setStatus(todo.getStatus());
+        originalTodo.setId(todo.getId());
+        originalTodo.setContent(todo.getContent());
+
         todo.setStatus(Todo.TODO_STATUS_DONE);
         updateTodo(todo);
-        undoTodo(todo);
+        undoTodo(originalTodo);
     }
 
-    private void undoTodo(final Todo todo) {
-        Snackbar.make(rcvMyTodos, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
+    private void undoTodo(Todo todo) {
+        Snackbar.make(rcvTodoNew, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        todo.setStatus(Todo.TODO_STATUS_NEW);
                         updateTodo(todo);
                     }
                 }).show();
@@ -235,9 +252,26 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     @Override
-    public void onChangeCheckbox(final Todo todo, final CompoundButton compoundButton) {
-        doneTodo(todo);
-        compoundButton.setChecked(false);
+    public void onChangeCheckbox(Todo todo) {
+        switch (todo.getStatus()) {
+            case Todo.TODO_STATUS_NEW:
+                doneTodo(todo);
+                break;
+            case Todo.TODO_STATUS_DONE:
+                Todo originalTodo = new Todo();
+                originalTodo.toEquals(todo);
+
+                todo.setStatus(Todo.TODO_STATUS_NEW);
+                updateTodo(todo);
+                undoTodo(originalTodo);
+                break;
+        }
+
+    }
+
+    @Override
+    public void onClickHeader() {
+
     }
 
     @Override
