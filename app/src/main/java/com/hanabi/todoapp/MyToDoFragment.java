@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.CollectionReference;
@@ -41,13 +40,13 @@ import java.util.ArrayList;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, CreateMyToDialog.clickButtonListener, BottomNavigationView.OnNavigationItemSelectedListener {
+public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener,
+        SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, CreateMyToDialog.clickButtonListener {
 
     private RecyclerView rcvMyTodos;
     private MyTodoAdapter adapter;
     private SwipeRefreshLayout srlReload;
     private FloatingActionButton fabAdd;
-    private BottomNavigationView bottomNavigationView;
 
 
     private CreateMyToDialog createMyToDialog;
@@ -105,7 +104,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         setHasOptionsMenu(true);
         createMyToDialog = new CreateMyToDialog(getActivity());
 
-        bottomNavigationView = getActivity().findViewById(R.id.bnav_my_todo);
         rcvMyTodos = getActivity().findViewById(R.id.rcv_my_todo);
         srlReload = getActivity().findViewById(R.id.srl_loading_my_todo);
         fabAdd = getActivity().findViewById(R.id.fab_add_my_todo);
@@ -118,8 +116,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
         rcvMyTodos.setAdapter(adapter);
         new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvMyTodos);
-
-        bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
         loadingData();
         updateData();
@@ -185,32 +181,22 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private void dissTodo(final Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_DISABLED);
         updateTodo(todo);
-        Snackbar.make(rcvMyTodos, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        todo.setStatus(Todo.TODO_STATUS_NEW);
-                        updateTodo(todo);
-                    }
-                }).show();
+        undoTodo(todo);
     }
 
     private void fallTodo(final Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_FAILED);
         updateTodo(todo);
-        Snackbar.make(rcvMyTodos, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        todo.setStatus(Todo.TODO_STATUS_NEW);
-                        updateTodo(todo);
-                    }
-                }).show();
+        undoTodo(todo);
     }
 
     private void doneTodo(final Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_DONE);
         updateTodo(todo);
+        undoTodo(todo);
+    }
+
+    private void undoTodo(final Todo todo) {
         Snackbar.make(rcvMyTodos, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
                 new View.OnClickListener() {
                     @Override
@@ -223,14 +209,14 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 
     @Override
     public void onClickMyTodo(final Todo todo) {
-        if (todo.getStatus() == Todo.TODO_STATUS_NEW) {
-            createMyToDialog.updateTodoDialog(todo);
-        }
+
     }
 
     @Override
     public void onClickLongMyTodo(Todo todo) {
-
+        if (todo.getStatus() == Todo.TODO_STATUS_NEW) {
+            createMyToDialog.updateTodoDialog(todo);
+        }
     }
 
     @Override
@@ -246,7 +232,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     public void onClickButtonSend(Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_NEW);
         updateTodo(todo);
-        createMyToDialog.dismiss();
     }
 
     @Override
@@ -272,11 +257,4 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         return true;
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-
-        }
-        return true;
-    }
 }

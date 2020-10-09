@@ -31,7 +31,7 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
     }
 
     private void initViews() {
-        imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
 
         View view = activity.getLayoutInflater().inflate(R.layout.form_add_my_todo, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -59,12 +59,12 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
     public void dismiss() {
         dialog.dismiss();
         edtContent.setText("");
-        edtContent.clearFocus();
-        imm.toggleSoftInput(InputMethodManager.HIDE_NOT_ALWAYS, 0);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     @Override
     public void onClick(View view) {
+
         switch (view.getId()) {
             case R.id.iv_add_my_todo:
                 if (edtContent.getText().toString().isEmpty()) {
@@ -75,6 +75,7 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
                 }
                 todo.setContent(edtContent.getText().toString());
                 listener.onClickButtonSend(todo);
+                dialog.dismiss();
                 todo = null;
                 break;
         }
