@@ -15,52 +15,52 @@
         android:layout_marginBottom="16dp"
         android:text="Thêm công việc"
         android:textColor="@color/colorBlack"
-        android:textSize="21sp"
+        android:textSize="24sp"
         android:textStyle="bold" />
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:layout_marginBottom="8dp">
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="32dp"-->
+<!--        android:layout_marginBottom="8dp">-->
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginHorizontal="4dp"
-            android:backgroundTint="@color/colorBlue"
-            app:cardCornerRadius="100dp" />
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="32dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_marginHorizontal="4dp"-->
+<!--            android:backgroundTint="@color/colorBlue"-->
+<!--            app:cardCornerRadius="100dp" />-->
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginHorizontal="4dp"
-            android:backgroundTint="@color/colorDanger"
-            app:cardCornerRadius="100dp" />
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="32dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_marginHorizontal="4dp"-->
+<!--            android:backgroundTint="@color/colorDanger"-->
+<!--            app:cardCornerRadius="100dp" />-->
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginHorizontal="4dp"
-            android:backgroundTint="@color/colorYellow"
-            app:cardCornerRadius="100dp" />
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="32dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_marginHorizontal="4dp"-->
+<!--            android:backgroundTint="@color/colorYellow"-->
+<!--            app:cardCornerRadius="100dp" />-->
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginHorizontal="4dp"
-            android:backgroundTint="@color/colorGreen"
-            app:cardCornerRadius="100dp" />
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="32dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_marginHorizontal="4dp"-->
+<!--            android:backgroundTint="@color/colorGreen"-->
+<!--            app:cardCornerRadius="100dp" />-->
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginHorizontal="4dp"
-            android:backgroundTint="@color/colorViolet"
-            app:cardCornerRadius="100dp" />
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="32dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_marginHorizontal="4dp"-->
+<!--            android:backgroundTint="@color/colorViolet"-->
+<!--            app:cardCornerRadius="100dp" />-->
 
 
-    </LinearLayout>
+<!--    </LinearLayout>-->
 
     <EditText
         android:id="@+id/edt_content"
@@ -83,18 +83,30 @@
         android:gravity="center_vertical">
 
         <ImageView
+            android:layout_centerVertical="true"
             android:id="@+id/iv_set_tag_todo"
-            android:layout_width="24dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
             android:src="@drawable/ic_tag" />
 
         <ImageView
             android:id="@+id/iv_set_time_todo"
             android:layout_width="24dp"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
             android:layout_toRightOf="@id/iv_set_tag_todo"
-            android:src="@drawable/ic_clock" />
+            android:src="@drawable/ic_calendar" />
+
+        <ImageView
+            android:layout_centerVertical="true"
+            android:id="@+id/iv_set_loop_todo"
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@id/iv_set_time_todo"
+            android:src="@drawable/ic_loop" />
+
 
         <ImageView
             android:id="@+id/iv_add_my_todo"
