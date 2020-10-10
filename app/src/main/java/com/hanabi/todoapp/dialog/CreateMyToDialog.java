@@ -17,7 +17,7 @@ import com.hanabi.todoapp.models.Todo;
 
 public class CreateMyToDialog implements View.OnClickListener, DialogInterface.OnDismissListener, PopupMenu.OnMenuItemClickListener {
 
-    private ImageView imgAdd;
+    private ImageView imgAdd, imgSetTime, imgSet;
     private EditText edtContent;
     private Activity activity;
     private AlertDialog dialog;
@@ -100,7 +100,7 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
     private void showPopupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(activity, view);
         switch (view.getId()) {
-            case R.id.iv_set_loop_todo:
+            case R.id.cp_set_loop_todo:
                 popupMenu.inflate(R.menu.menu_loop_todo);
                 break;
         }

@@ -4,7 +4,7 @@
         android:id="@+id/it_tomorrow"
         android:title="Ngày mai" />
     <item
-        android:id="@+id/it_after_tomorrow"
+        android:id="@+id/it_next_tomorrow"
         android:title="Ngày kia" />
     <item
         android:id="@+id/it_next_week"
