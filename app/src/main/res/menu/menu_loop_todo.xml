@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/it_todo_day"
+        android:title="Mỗi ngày" />
+    <item
+        android:id="@+id/it_to_week"
+        android:title="Mỗi tuần" />
+    <item
+        android:id="@+id/it_to_moth"
+        android:title="Mỗi tháng" />
+    <item
+        android:id="@+id/it_to_year"
+        android:title="Mỗi năm" />
+    <item
+        android:id="@+id/it_to_custom"
+        android:title="Mỗi tuần" />
+
+</menu>

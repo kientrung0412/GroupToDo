@@ -32,7 +32,7 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
     private void initViews() {
         imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
 
-        View view = activity.getLayoutInflater().inflate(R.layout.add_my_todo_dialog, null);
+        View view = activity.getLayoutInflater().inflate(R.layout.dialog_add_my_todo, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         edtContent = view.findViewById(R.id.edt_content);
         imgAdd = view.findViewById(R.id.iv_add_my_todo);
