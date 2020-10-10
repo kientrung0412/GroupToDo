@@ -51,7 +51,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private SwipeRefreshLayout srlReload;
     private FloatingActionButton fabAdd;
 
-
     private CreateMyToDialog createMyToDialog;
 
     private CollectionReference reference = Database.getDb().collection(Todo.TODO_COLL)
@@ -69,7 +68,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                     Todo todo = adapterNew.getData().get(viewHolder.getAdapterPosition());
                     switch (direction) {
                         case ItemTouchHelper.LEFT:
-                            dissTodo(todo);
+                            deleteTodo(todo);
                             break;
                         case ItemTouchHelper.RIGHT:
 //                            fallTodo(todo);
@@ -121,6 +120,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
         rcvTodoNew.setAdapter(adapterNew);
 
+        setTitleToolBar("Hôm nay");
 
         new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvTodoNew);
 
@@ -189,13 +189,26 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 });
     }
 
-    private void dissTodo(Todo todo) {
+    private void deleteTodo(Todo todo) {
         Todo originalTodo = new Todo();
         originalTodo.toEquals(todo);
 
-        todo.setStatus(Todo.TODO_STATUS_DISABLED);
-        updateTodo(todo);
-        undoTodo(originalTodo);
+        reference.document(todo.getId() + "")
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        undoTodo(originalTodo);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
     }
 
     private void fallTodo(Todo todo) {
@@ -222,6 +235,13 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                         updateTodo(todo);
                     }
                 }).show();
+    }
+
+    private void setTitleToolBar(String title) {
+        ((MainActivity) getActivity()).getToolbar().setTitle(title);
+        ((MainActivity) getActivity()).getToolbar().setOnClickListener(view -> {
+            Toast.makeText(getActivity(), "ahsdg", Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override

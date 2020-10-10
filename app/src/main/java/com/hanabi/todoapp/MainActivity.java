@@ -152,4 +152,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
     }
+
+    public MaterialToolbar getToolbar() {
+        return toolbar;
+    }
 }

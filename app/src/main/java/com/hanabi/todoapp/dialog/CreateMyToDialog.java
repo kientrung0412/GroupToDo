@@ -1,7 +1,6 @@
 package com.hanabi.todoapp.dialog;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -33,7 +32,7 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
     private void initViews() {
         imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
 
-        View view = activity.getLayoutInflater().inflate(R.layout.form_add_my_todo, null);
+        View view = activity.getLayoutInflater().inflate(R.layout.add_my_todo_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         edtContent = view.findViewById(R.id.edt_content);
         imgAdd = view.findViewById(R.id.iv_add_my_todo);

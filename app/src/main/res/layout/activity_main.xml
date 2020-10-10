@@ -24,8 +24,11 @@
                 android:layout_height="?attr/actionBarSize"
                 android:theme="@style/AppTheme.Toolbar"
                 app:navigationIcon="@drawable/ic_baseline_menu_24"
-                app:title="Demo"
-                app:titleTextColor="@color/colorWhite" />
+                app:title="">
+
+
+
+            </com.google.android.material.appbar.MaterialToolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
 

@@ -1,6 +1,7 @@
 package com.hanabi.todoapp.adapter;
 
 
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,11 +111,14 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
             switch (todo.getStatus()) {
                 case Todo.TODO_STATUS_NEW:
                     cbDone.setChecked(false);
+//                    tvContent.setPaintFlags(tvContent.getPaintFlags() ^ Paint.STRIKE_THRU_TEXT_FLAG);
                     break;
                 case Todo.TODO_STATUS_DONE:
                     cbDone.setChecked(true);
+//                    tvContent.setPaintFlags(tvContent.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     break;
             }
+
         }
 
     }
