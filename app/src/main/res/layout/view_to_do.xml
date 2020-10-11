@@ -6,6 +6,7 @@
     android:padding="4dp">
 
     <CheckBox
+        style="@style/Widget.AppCompat.CompoundButton.RadioButton"
         android:id="@+id/cb_done"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

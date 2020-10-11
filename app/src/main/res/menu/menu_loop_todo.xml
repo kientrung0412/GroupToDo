@@ -5,16 +5,16 @@
         android:id="@+id/it_todo_day"
         android:title="Mỗi ngày" />
     <item
-        android:id="@+id/it_to_week"
+        android:id="@+id/it_todo_week"
         android:title="Mỗi tuần" />
     <item
-        android:id="@+id/it_to_moth"
+        android:id="@+id/it_todo_moth"
         android:title="Mỗi tháng" />
     <item
-        android:id="@+id/it_to_year"
+        android:id="@+id/it_todo_year"
         android:title="Mỗi năm" />
     <item
-        android:id="@+id/it_to_custom"
-        android:title="Mỗi tuần" />
+        android:id="@+id/it_todo_custom"
+        android:title="Tự trọn" />
 
 </menu>

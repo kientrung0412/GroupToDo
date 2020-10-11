@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
@@ -40,7 +41,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.adapter.MyTodoAdapter;
 import com.hanabi.todoapp.dao.Database;
-import com.hanabi.todoapp.dialog.CreateMyToDialog;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.utils.ManageDate;
 
@@ -54,9 +54,9 @@ import java.util.Date;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener,
-        SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, CreateMyToDialog.clickButtonListener, PopupMenu.OnMenuItemClickListener {
+        SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
-    private RecyclerView rcvTodoNew;
+    private RecyclerView rcvTodo;
     private MyTodoAdapter adapterNew;
     private SwipeRefreshLayout srlReload;
     private FloatingActionButton fabAdd;
@@ -70,6 +70,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
     private ManageDate manageDate = new ManageDate();
     private Date now = new Date();
+    private Date selectDate = new Date();
 
     private Date prompt, createdAt = null;
     private Boolean isLoop = false;
@@ -141,7 +142,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 //        createMyToDialog = new CreateMyToDialog(getActivity());
         imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
 
-        rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new);
+        rcvTodo = getActivity().findViewById(R.id.rcv_my_todo_new);
         srlReload = getActivity().findViewById(R.id.srl_loading_my_todo);
         fabAdd = getActivity().findViewById(R.id.fab_add_my_todo);
         llAddTodo = getActivity().findViewById(R.id.ln_add_my_todo);
@@ -153,21 +154,25 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 //        createMyToDialog.setListener(this);
         adapterNew = new MyTodoAdapter(getLayoutInflater());
 
+        ((SimpleItemAnimator) rcvTodo.getItemAnimator()).setSupportsChangeAnimations(false);
+
 
         llAddTodo.setVisibility(View.GONE);
         ivAdd.setOnClickListener(this);
         cpLoop.setOnClickListener(this);
         cpTime.setOnClickListener(this);
+        cpLoop.setOnCloseIconClickListener(this);
+        cpTime.setOnCloseIconClickListener(this);
 
         adapterNew.setListener(this);
         srlReload.setOnRefreshListener(this);
         fabAdd.setOnClickListener(this);
         srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
-        rcvTodoNew.setAdapter(adapterNew);
+        rcvTodo.setAdapter(adapterNew);
 
         setTitleToolBar("Hôm nay");
 
-        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvTodoNew);
+        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvTodo);
 
         loadingData();
         updateData();
@@ -185,6 +190,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 loadingData();
             }
         });
+
     }
 
     private void loadingData() {
@@ -192,8 +198,11 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     private void getTodos(MyTodoAdapter adapter) {
+
         reference.whereIn("status", Arrays.asList(Todo.TODO_STATUS_DONE, Todo.TODO_STATUS_NEW))
-                .orderBy("id", Query.Direction.DESCENDING)
+                .whereLessThan("createdAt", manageDate.getNow(manageDate.getDateTomorrow(selectDate)))
+                .whereGreaterThan("createdAt", manageDate.getNow(selectDate))
+                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -273,7 +282,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     private void undoTodo(Todo todo) {
-        Snackbar.make(rcvTodoNew, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
+        Snackbar.make(rcvTodo, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -283,9 +292,9 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     private void setTitleToolBar(String title) {
-        ((MainActivity) getActivity()).getToolbar().setTitle(title);
+        ((MainActivity) getActivity()).setTitle(title);
         ((MainActivity) getActivity()).getToolbar().setOnClickListener(view -> {
-            Toast.makeText(getActivity(), "ahsdg", Toast.LENGTH_SHORT).show();
+            pickDateShow();
         });
     }
 
@@ -318,9 +327,10 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 Todo todo = new Todo();
                 todo.setContent(edtContent.getText().toString().trim());
                 todo.setStatus(Todo.TODO_STATUS_NEW);
-                todo.setCreatedAt(createdAt);
+                if (createdAt != null) {
+                    todo.setCreatedAt(createdAt);
+                }
                 todo.setPromptDate(prompt);
-
                 updateTodo(todo);
 
                 edtContent.setText("");
@@ -331,12 +341,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
             default:
                 showPopupMemu(view);
         }
-    }
-
-    @Override
-    public void onClickButtonSend(Todo todo) {
-        todo.setStatus(Todo.TODO_STATUS_NEW);
-        updateTodo(todo);
     }
 
     @Override
@@ -354,11 +358,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 undoTodo(originalTodo);
                 break;
         }
-
-    }
-
-    @Override
-    public void onClickHeader() {
 
     }
 
@@ -415,7 +414,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.it_select_day:
-                pickDate();
+                pickDateCreater();
                 break;
             case R.id.it_tomorrow:
                 createdAt = manageDate.getDateTomorrow(now);
@@ -436,7 +435,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         return true;
     }
 
-    private void pickDate() {
+    private void pickDateCreater() {
         MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
         builder.setTitleText("Chọn một ngày");
         final MaterialDatePicker materialDatePicker;
@@ -453,6 +452,27 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 }
 
             }
+        });
+    }
+
+    private void pickDateShow() {
+        MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.datePicker();
+        builder.setTitleText("Chọn một ngày");
+        final MaterialDatePicker materialDatePicker;
+        materialDatePicker = builder.build();
+        materialDatePicker.show(getActivity().getSupportFragmentManager(), "Chon ngày");
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+            selectDate = new Date(Long.parseLong(selection.toString()));
+            String dateStr = dateFormat.format(selectDate);
+
+            if (dateFormat.format(now).equals(dateStr)) {
+                ((MainActivity) getActivity()).setTitle("Hôm nay");
+                loadingData();
+                return;
+            }
+            ((MainActivity) getActivity()).setTitle(dateStr);
+            loadingData();
         });
     }
 }

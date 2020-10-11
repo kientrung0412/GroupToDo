@@ -48,7 +48,7 @@
         android:layout_alignRight="@+id/nsv_list_todo"
         android:layout_alignBottom="@+id/nsv_list_todo"
         android:layout_margin="32dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorYellow"
         app:srcCompat="@drawable/ic_baseline_add_24" />
 
 </RelativeLayout>

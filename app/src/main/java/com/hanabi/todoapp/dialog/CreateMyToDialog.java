@@ -114,13 +114,13 @@ public class CreateMyToDialog implements View.OnClickListener, DialogInterface.O
             case R.id.it_todo_day:
                 Toast.makeText(activity, "day", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.it_to_week:
+            case R.id.it_todo_week:
                 Toast.makeText(activity, "week", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.it_to_moth:
+            case R.id.it_todo_moth:
                 Toast.makeText(activity, "it_to_moth", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.it_to_year:
+            case R.id.it_todo_year:
                 Toast.makeText(activity, "week", Toast.LENGTH_SHORT).show();
                 break;
         }

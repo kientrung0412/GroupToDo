@@ -1,12 +1,12 @@
 package com.hanabi.todoapp.adapter;
 
 
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.R;
 
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTodo> {
 
@@ -26,6 +26,8 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
     private LayoutInflater layoutInflater;
     private ArrayList<Todo> data;
     private OnClickMyTodoListener listener;
+
+    private int isFirstDone;
 
     public MyTodoAdapter(LayoutInflater layoutInflater) {
         this.layoutInflater = layoutInflater;
@@ -37,16 +39,24 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
     public void setData(ArrayList<Todo> data) {
         this.data = data;
+        isFirstDone = 0;
+        sortData();
         notifyDataSetChanged();
+    }
+
+    private void sortData() {
+        Collections.sort(this.data, (todo1, todo2) -> {
+            int result = todo1.getStatus() - todo2.getStatus();
+            if (result != 0) {
+                return (int) result;
+            }
+            result = (int) (todo2.getId() - todo1.getId());
+            return (int) result;
+        });
     }
 
     public ArrayList<Todo> getData() {
         return data;
-    }
-
-    public void addData(Todo todo) {
-        data.add(todo);
-        notifyDataSetChanged();
     }
 
 
@@ -59,8 +69,13 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
     @Override
     public void onBindViewHolder(@NonNull HolderMyTodo holder, int position) {
+
         final Todo todo = data.get(position);
+        if (todo.getStatus() == Todo.TODO_STATUS_DONE) {
+            isFirstDone++;
+        }
         holder.bindView(todo);
+
         if (listener != null) {
             holder.cbDone.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -105,17 +120,25 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         private void bindView(Todo todo) {
             tvContent.setText(todo.getContent());
             DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
-            String dateStr = dateFormat.format(todo.getId());
+            String dateStr = dateFormat.format(todo.getCreatedAt());
             tvTime.setText(dateStr);
+
+//            if (isFirstDone == 1) {
+//                tvContent.setTextColor(Color.RED);
+//            } else {
+//                tvContent.setTextColor(Color.BLACK);
+//            }
 
             switch (todo.getStatus()) {
                 case Todo.TODO_STATUS_NEW:
                     cbDone.setChecked(false);
-//                    tvContent.setPaintFlags(tvContent.getPaintFlags() ^ Paint.STRIKE_THRU_TEXT_FLAG);
+                    if ((tvContent.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0){
+                        tvContent.setPaintFlags(tvContent.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    }
                     break;
                 case Todo.TODO_STATUS_DONE:
                     cbDone.setChecked(true);
-//                    tvContent.setPaintFlags(tvContent.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    tvContent.setPaintFlags(tvContent.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     break;
             }
 
@@ -130,7 +153,6 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
         void onChangeCheckbox(Todo todo);
 
-        void onClickHeader();
     }
 
 }

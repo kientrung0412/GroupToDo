@@ -1,5 +1,8 @@
 package com.hanabi.todoapp.utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.Calendar;
 import java.util.Date;
@@ -65,5 +68,16 @@ public class ManageDate {
         return getStingDayOfWeek(getDateNextTomorrow(date));
     }
 
+    public Date getNow(Date date) {
+        cal.setTime(date);
+        String strNow = String.format("%s/%s/%s", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR));
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            return dateFormat.parse(strNow);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }
