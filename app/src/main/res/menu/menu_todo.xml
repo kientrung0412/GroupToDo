@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/it_sort_status"
-        android:title="Sắp xếp theo trạng thái"></item>
+    <item
+        android:id="@+id/it_sort_status"
+        android:title="Sắp xếp theo trạng thái" />
+    <item
+        android:id="@+id/it_sort_created"
+        android:title="Sắp xếp theo thời gian" />
+
+    <item
+        android:id="@+id/it_sort_start"
+        android:title="Sắp xếp theo mức độ ưu tiện" />
 </menu>
