@@ -4,16 +4,16 @@ import android.app.Activity;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.hanabi.todoapp.adapter.MyTodoAdapter;
 import com.hanabi.todoapp.models.Todo;
 
-import java.util.Arrays;
 import java.util.Date;
 
 public class TodoDao {
@@ -27,80 +27,78 @@ public class TodoDao {
         this.activity = activity;
     }
 
-    public CollectionReference getReference() {
-        return reference;
-    }
-
     public void setListener(DataChangeListener listener) {
         this.listener = listener;
     }
 
-    private void getTodos(MyTodoAdapter adapter, Date startDate, Date endDate, int... status) {
-        reference.whereArrayContains("status", Arrays.asList(status))
-                .whereLessThan("createdAt", startDate)
-                .whereGreaterThan("createdAt", endDate)
+    public void getTodos(Date startDate, Date endDate, int status) {
+        Query querySnapshotTask = reference.whereEqualTo("status", status);
+
+        if (startDate != null) {
+            querySnapshotTask = querySnapshotTask.whereLessThan("createdAt", startDate);
+        }
+
+        if (endDate != null) {
+            querySnapshotTask = querySnapshotTask.whereGreaterThan("createdAt", endDate);
+        }
+
+        querySnapshotTask
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        listener.getTodoSuccess(queryDocumentSnapshots);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                .addOnSuccessListener(queryDocumentSnapshots -> listener.getTodoSuccess(status, queryDocumentSnapshots))
+                .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    private void updateTodo(Todo todo) {
+    public void updateTodo(Todo todo) {
         reference.document(todo.getId() + "")
                 .set(todo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                    }
+                .addOnSuccessListener(aVoid -> {
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    private void deleteTodo(Todo todo) {
+    public void deleteTodo(Todo todo) {
         Todo originalTodo = new Todo();
         originalTodo.toEquals(todo);
 
         reference.document(todo.getId() + "")
                 .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                       listener.deleteTodoSuccess(originalTodo);
-                    }
-                })
+                .addOnSuccessListener(aVoid -> listener.deleteTodoSuccess(originalTodo))
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
-
     }
 
-    private void doneTodo(Todo todo) {
+    public void doneTodo(Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_DONE);
         updateTodo(todo);
     }
 
 
-    interface DataChangeListener {
-        void getTodoSuccess(QuerySnapshot queryDocumentSnapshots);
+    public void realtimeUpdate() {
+
+        reference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                listener.realtimeUpdateSuccess();
+            }
+        });
+
+    }
+
+    public interface DataChangeListener {
+        void getTodoSuccess(int core, QuerySnapshot queryDocumentSnapshots);
+
         void deleteTodoSuccess(Todo todo);
+
+        void realtimeUpdateSuccess();
+
     }
 }

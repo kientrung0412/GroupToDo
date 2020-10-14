@@ -6,8 +6,8 @@
     android:padding="4dp">
 
     <CheckBox
-        style="@style/Widget.AppCompat.CompoundButton.RadioButton"
         android:id="@+id/cb_done"
+        style="@style/Widget.AppCompat.CompoundButton.RadioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical" />
@@ -30,13 +30,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!--            <ImageView-->
-            <!--                android:layout_width="18dp"-->
-            <!--                android:layout_height="18dp"-->
-            <!--                android:layout_marginRight="8dp"-->
-            <!--                android:src="@drawable/ic_clock" />-->
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tv_todo_create_at"
@@ -44,7 +39,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="16dp"
-                android:text="21/12" />
+                android:text="Hôm nay" />
+
+            <ImageView
+                android:id="@+id/iv_loop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_loop"
+                android:visibility="gone" />
 
         </LinearLayout>
     </LinearLayout>

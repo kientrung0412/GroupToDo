@@ -1,12 +1,12 @@
 package com.hanabi.todoapp.adapter;
 
 
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,10 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.R;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTodo> {
 
@@ -92,19 +89,24 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
         private TextView tvContent, tvTime;
         private CheckBox cbDone;
+        private ImageView ivLoop;
 
         public HolderMyTodo(@NonNull View itemView) {
             super(itemView);
             tvContent = itemView.findViewById(R.id.tv_content_todo);
-            tvTime = itemView.findViewById(R.id.tv_todo_create_at);
+            ivLoop = itemView.findViewById(R.id.iv_loop);
+//            tvTime = itemView.findViewById(R.id.tv_todo_create_at);
             cbDone = itemView.findViewById(R.id.cb_done);
         }
 
         private void bindView(Todo todo) {
             tvContent.setText(todo.getContent());
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
-            String dateStr = dateFormat.format(todo.getCreatedAt());
-            tvTime.setText(dateStr);
+
+            if (todo.getLoop()) {
+                ivLoop.setVisibility(View.VISIBLE);
+            } else {
+                ivLoop.setVisibility(View.GONE);
+            }
 
             switch (todo.getStatus()) {
                 case Todo.TODO_STATUS_NEW:

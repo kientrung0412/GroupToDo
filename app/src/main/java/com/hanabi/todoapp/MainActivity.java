@@ -112,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()) {
             case R.id.it_my_todo:
                 showFragment(myToDoFragment);
-                setTitle(myToDoFragment.getTitle());
                 break;
             case R.id.it_chat:
                 showFragment(chatFragment);

@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
@@ -27,21 +26,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.adapter.MyTodoAdapter;
-import com.hanabi.todoapp.dao.Database;
+import com.hanabi.todoapp.dao.TodoDao;
 import com.hanabi.todoapp.models.LoopTodo;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.utils.ManageDate;
@@ -57,7 +49,7 @@ import java.util.Date;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyTodoListener,
-        SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+        SwipeRefreshLayout.OnRefreshListener, View.OnClickListener, PopupMenu.OnMenuItemClickListener, TodoDao.DataChangeListener {
 
     private String titleToolBar = "Hôm nay";
 
@@ -77,51 +69,12 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private ManageDate manageDate = new ManageDate();
     private Calendar calendar = Calendar.getInstance();
     private Date now = calendar.getTime();
-    private Date selectDate = calendar.getTime();
     private LoopTodo loopTodo = new LoopTodo();
 
+    private Boolean isLoop = false;
     private Date prompt, createdAt = null;
 
-    private CollectionReference reference = Database.getDb().collection(Todo.TODO_COLL)
-            .document(Database.getFirebaseUser().getUid()).collection(Todo.TODO_COLL_MY_TODO);
-
-    private ItemTouchHelper.SimpleCallback simpleCallbackDelete =
-            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-                @Override
-                public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                    return false;
-                }
-
-                @Override
-                public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                    Todo todo = adapterNew.getData().get(viewHolder.getAdapterPosition());
-                    switch (direction) {
-                        case ItemTouchHelper.LEFT:
-                            deleteTodo(todo);
-                            break;
-                        case ItemTouchHelper.RIGHT:
-//                            fallTodo(todo);
-                            break;
-                    }
-                }
-
-                @Override
-                public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
-                                        float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                    new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                            .addSwipeLeftActionIcon(R.drawable.ic_delete)
-                            .addSwipeLeftBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorDanger))
-                            .addSwipeLeftLabel("Xóa bỏ")
-                            .setSwipeLeftLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
-//                            .addSwipeRightActionIcon(R.drawable.ic_diss)
-//                            .addSwipeRightBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorYellow))
-//                            .addSwipeRightLabel("Không hoàn thành")
-//                            .setSwipeRightLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
-                            .create()
-                            .decorate();
-                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-                }
-            };
+    private TodoDao todoDao = new TodoDao(getActivity());
 
     public LinearLayout getLlAddTodo() {
         return llAddTodo;
@@ -181,127 +134,27 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         rcvTodoNew.setAdapter(adapterNew);
         rcvTodoDone.setAdapter(adapterDone);
 
-        getActivity().setTitle("Hôm nay");
+        getActivity().setTitle(titleToolBar);
 
-        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvTodoNew);
-        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvTodoDone);
+        swipeRecyclerView(rcvTodoNew, adapterNew);
+        swipeRecyclerView(rcvTodoDone, adapterDone);
+
+        todoDao.setListener(this);
 
         loadingData();
-        updateData();
+        realtimeUpdate();
     }
 
-    private void updateData() {
-
-        reference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Toast.makeText(getActivity(), "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                loadingData();
-            }
-        });
-
+    private void realtimeUpdate() {
+        todoDao.realtimeUpdate();
     }
 
     private void loadingData() {
-        getTodos(adapterNew, Todo.TODO_STATUS_NEW);
-        getTodos(adapterDone, Todo.TODO_STATUS_DONE);
+
+        todoDao.getTodos(manageDate.getNow(manageDate.getDateTomorrow(now)), manageDate.getNow(now), Todo.TODO_STATUS_NEW);
+        todoDao.getTodos(manageDate.getNow(manageDate.getDateTomorrow(now)), manageDate.getNow(now), Todo.TODO_STATUS_DONE);
 
     }
-
-    private void getTodos(MyTodoAdapter adapter, int status) {
-        reference.whereEqualTo("status", status)
-                .whereLessThan("createdAt", manageDate.getNow(manageDate.getDateTomorrow(selectDate)))
-                .whereGreaterThan("createdAt", manageDate.getNow(selectDate))
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        ArrayList<Todo> todos = new ArrayList<>();
-                        if (queryDocumentSnapshots.isEmpty()) {
-                            adapter.setData(todos);
-                            if (status == Todo.TODO_STATUS_DONE) {
-                                llMore.setVisibility(View.GONE);
-                            }
-                            return;
-                        }
-
-                        for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-                            Todo todo = document.toObject(Todo.class);
-                            todos.add(todo);
-                            adapter.setData(todos);
-                        }
-
-                        if (status == Todo.TODO_STATUS_DONE) {
-                            llMore.setVisibility(View.VISIBLE);
-                            tvCountDone.setText(adapter.getItemCount() + "");
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getActivity(), "Lỗi:" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void updateTodo(Todo todo) {
-        reference.document(todo.getId() + "")
-                .set(todo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void deleteTodo(Todo todo) {
-        Todo originalTodo = new Todo();
-        originalTodo.toEquals(todo);
-
-        reference.document(todo.getId() + "")
-                .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        undoTodo(originalTodo);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-
-    }
-
-    private void doneTodo(Todo todo) {
-        todo.setStatus(Todo.TODO_STATUS_DONE);
-        updateTodo(todo);
-    }
-
-    private void undoTodo(Todo todo) {
-        Snackbar.make(rcvTodoNew, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        updateTodo(todo);
-                    }
-                }).show();
-    }
-
 
     @Override
     public void onClickMyTodo(final Todo todo) {
@@ -319,11 +172,9 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 llAddTodo.setVisibility(View.VISIBLE);
                 fabAdd.setVisibility(View.GONE);
 
-                edtContent.forceLayout();
 //                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 break;
             case R.id.iv_add_my_todo:
-                //add todo
                 if (edtContent.getText().toString().trim().isEmpty()) {
                     return;
                 }
@@ -335,8 +186,9 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 }
                 todo.setPromptDate(prompt);
                 todo.setLoopTodoMap(loopTodo.toMap());
+                todo.setLoop(isLoop);
 
-                updateTodo(todo);
+                todoDao.updateTodo(todo);
                 resetDataForm();
 
                 break;
@@ -357,24 +209,28 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     private void resetDataForm() {
+        isLoop = false;
+        createdAt = null;
+        prompt = null;
         loopTodo.reset();
         edtContent.setText("");
-        prompt = null;
         cpLoop.setText("Lặp lại");
         cpLoop.setCloseIconVisible(false);
+        cpLoop.setChipBackgroundColorResource(R.color.colorGray);
         cpTime.setText("Đặt lịch");
         cpTime.setCloseIconVisible(false);
+        cpTime.setChipBackgroundColorResource(R.color.colorGray);
     }
 
     @Override
     public void onChangeCheckbox(Todo todo) {
         switch (todo.getStatus()) {
             case Todo.TODO_STATUS_NEW:
-                doneTodo(todo);
+                todoDao.doneTodo(todo);
                 break;
             case Todo.TODO_STATUS_DONE:
                 todo.setStatus(Todo.TODO_STATUS_NEW);
-                updateTodo(todo);
+                todoDao.updateTodo(todo);
                 break;
         }
 
@@ -403,9 +259,9 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         switch (view.getId()) {
             case R.id.cp_set_loop_todo:
                 if (cpLoop.isCloseIconVisible()) {
-                    cpLoop.setText("Lặp lại");
+                    chipClick(cpLoop, "Lặp lại");
                     loopTodo.reset();
-                    cpLoop.setCloseIconVisible(false);
+                    isLoop = false;
                     return;
                 }
                 popupMenu.inflate(R.menu.menu_loop_todo);
@@ -414,9 +270,8 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 break;
             case R.id.cp_set_time_todo:
                 if (cpTime.isCloseIconVisible()) {
-                    cpTime.setText("Đặt lịch");
+                    chipClick(cpTime, "Đặt lịch");
                     createdAt = null;
-                    cpTime.setCloseIconVisible(false);
                     return;
                 }
                 popupMenu.inflate(R.menu.menu_time_todo);
@@ -433,7 +288,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         popupMenu.show();
     }
 
-
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
@@ -442,41 +296,39 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 break;
             case R.id.it_tomorrow:
                 createdAt = manageDate.getDateTomorrow(now);
-                cpTime.setText(dateFormat.format(createdAt));
-                cpTime.setCloseIconVisible(true);
+                chipClick(cpTime, dateFormat.format(createdAt));
                 break;
             case R.id.it_next_tomorrow:
                 createdAt = manageDate.getDateNextTomorrow(now);
-                cpTime.setText(dateFormat.format(createdAt));
-                cpTime.setCloseIconVisible(true);
+                chipClick(cpTime, dateFormat.format(createdAt));
                 break;
             case R.id.it_next_week:
                 createdAt = manageDate.getDateNextWeek(now);
-                cpTime.setText(dateFormat.format(createdAt));
-                cpTime.setCloseIconVisible(true);
+                chipClick(cpTime, dateFormat.format(createdAt));
                 break;
             case R.id.it_loop_day:
                 loopTodo.setDays(1);
-                cpLoop.setText("Mỗi ngày");
-                cpLoop.setCloseIconVisible(true);
+                isLoop = true;
+                chipClick(cpLoop, "Mỗi ngày");
                 break;
             case R.id.it_loop_week:
                 loopTodo.setDays(7);
-                cpLoop.setText("Mỗi tuần vào " + manageDate.getStingDayOfWeek(now));
-                cpLoop.setCloseIconVisible(true);
+                isLoop = true;
+                chipClick(cpLoop, "Mỗi tuần vào " + manageDate.getStingDayOfWeek(now));
                 break;
             case R.id.it_loop_moth:
                 loopTodo.setMonths(1);
-                cpLoop.setText("Mỗi tháng");
-                cpLoop.setCloseIconVisible(true);
+                isLoop = true;
+                chipClick(cpLoop, "Mỗi tháng");
                 break;
             case R.id.it_loop_year:
                 loopTodo.setYears(1);
-                cpLoop.setText("Mỗi năm");
-                cpLoop.setCloseIconVisible(true);
+                isLoop = true;
+                chipClick(cpLoop, "Mỗi năm");
                 break;
             case R.id.it_loop_custom:
-                cpLoop.setCloseIconVisible(true);
+                isLoop = true;
+//                chipCheck(cpLoop, "Mỗi ngày");
                 break;
         }
         return true;
@@ -505,15 +357,101 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                cpTime.setText(dateFormat.format(createdAt));
-                cpTime.setCloseIconVisible(true);
+                chipClick(cpTime, dateFormat.format(createdAt));
             }
         }, year, month, day);
         datePickerDialog.show();
     }
 
-    public String getTitle() {
-        return this.titleToolBar;
+    @Override
+    public void getTodoSuccess(int code, QuerySnapshot queryDocumentSnapshots) {
+        ArrayList<Todo> todos = new ArrayList<>();
+        switch (code) {
+            case Todo.TODO_STATUS_NEW:
+                if (queryDocumentSnapshots.isEmpty()) {
+                    adapterNew.setData(todos);
+                    return;
+                }
+
+                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                    Todo todo = document.toObject(Todo.class);
+                    todos.add(todo);
+                    adapterNew.setData(todos);
+                }
+
+                break;
+
+            case Todo.TODO_STATUS_DONE:
+                if (queryDocumentSnapshots.isEmpty()) {
+                    adapterDone.setData(todos);
+                    llMore.setVisibility(View.GONE);
+                    return;
+                }
+                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                    Todo todo = document.toObject(Todo.class);
+                    todos.add(todo);
+                    adapterDone.setData(todos);
+                }
+                llMore.setVisibility(View.VISIBLE);
+                tvCountDone.setText(adapterDone.getItemCount() + "");
+                break;
+        }
+
     }
 
+    @Override
+    public void deleteTodoSuccess(Todo todo) {
+        Snackbar.make(rcvTodoNew, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
+                view -> todoDao.updateTodo(todo)).show();
+    }
+
+    @Override
+    public void realtimeUpdateSuccess() {
+        loadingData();
+    }
+
+    private void chipClick(Chip chip, String text) {
+        chip.setText(text);
+        chip.setCloseIconVisible(!chip.isCloseIconVisible());
+        if (chip.isCloseIconVisible()) {
+            chip.setChipBackgroundColorResource(R.color.colorPrimary);
+            return;
+        }
+        chip.setChipBackgroundColorResource(R.color.colorGray);
+    }
+
+    private void swipeRecyclerView(RecyclerView recyclerView, MyTodoAdapter adapter) {
+        ItemTouchHelper.SimpleCallback simpleCallbackDelete =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        Todo todo = adapter.getData().get(viewHolder.getAdapterPosition());
+                        switch (direction) {
+                            case ItemTouchHelper.LEFT:
+                                todoDao.deleteTodo(todo);
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                            float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                                .addSwipeLeftActionIcon(R.drawable.ic_delete)
+                                .addSwipeLeftBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorDanger))
+                                .addSwipeLeftLabel("Xóa bỏ")
+                                .setSwipeLeftLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
+                                .create()
+                                .decorate();
+                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                    }
+                };
+
+        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(recyclerView);
+    }
 }
