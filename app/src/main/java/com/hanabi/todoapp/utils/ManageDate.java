@@ -11,7 +11,7 @@ public class ManageDate {
 
     private Calendar cal = Calendar.getInstance();
 
-    private String getStingDayOfWeek(Date date) {
+    public String getStingDayOfWeek(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
 

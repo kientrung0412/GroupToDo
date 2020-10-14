@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/it_todo_day"
+        android:id="@+id/it_loop_day"
         android:title="Mỗi ngày" />
     <item
-        android:id="@+id/it_todo_week"
+        android:id="@+id/it_loop_week"
         android:title="Mỗi tuần" />
     <item
-        android:id="@+id/it_todo_moth"
+        android:id="@+id/it_loop_moth"
         android:title="Mỗi tháng" />
     <item
-        android:id="@+id/it_todo_year"
+        android:id="@+id/it_loop_year"
         android:title="Mỗi năm" />
     <item
-        android:id="@+id/it_todo_custom"
+        android:id="@+id/it_loop_custom"
         android:title="Tự trọn" />
 
 </menu>

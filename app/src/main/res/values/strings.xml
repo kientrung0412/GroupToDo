@@ -11,14 +11,14 @@
     <string name="navigaton_content_close">Đóng</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="todo">Công việc</string>
+    <string name="todo">Tác vụ</string>
     <string name="message">Tin nhắn</string>
     <!--    login activity-->
     <string name="error_login_google">Đăng nhập thất bại, mã lỗi </string>
     <string name="fall_login">Đăng nhập thất bại</string>
     <string name="add_todo">Thêm</string>
-    <string name="my_todo">Công việc của tôi</string>
-    <string name="group_todo">Công việc nhóm</string>
+    <string name="my_todo">Tác vụ của tôi</string>
+    <string name="group_todo">Tác vụ nhóm</string>
     <string name="menu_todo_done">Hoàn thành</string>
     <string name="menu_todo_new">Mới</string>
     <string name="menu_todo_fall">Thất bại</string>

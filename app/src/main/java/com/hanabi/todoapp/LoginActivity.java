@@ -30,7 +30,10 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.hanabi.todoapp.dao.Database;
+import com.hanabi.todoapp.dao.UserDao;
 import com.hanabi.todoapp.dialog.LoadingDialog;
+import com.hanabi.todoapp.models.User;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -42,6 +45,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private CallbackManager callbackManager;
     private GoogleSignInClient mGoogleSignInClient;
+
+    private UserDao userDao = new UserDao();
 
     @Override
     public void onStart() {
@@ -153,6 +158,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            userDao.createUser(Database.getFirebaseUser());
                             updateUI();
                         } else {
                             loadingDialog.dismissLoadingDialog();

@@ -9,11 +9,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -38,8 +37,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CircleImageView civAvatar;
 
     private MyToDoFragment myToDoFragment = new MyToDoFragment();
-    private GroupToDoFragment groupToDoFragment = new GroupToDoFragment();
-    private RoomChatFragment roomChatFragment = new RoomChatFragment();
+    private ChatFragment chatFragment = new ChatFragment();
 
 
     @Override
@@ -74,18 +72,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void initFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.fl_main, chatFragment);
         transaction.add(R.id.fl_main, myToDoFragment);
-        transaction.add(R.id.fl_main, roomChatFragment);
-
         transaction.commit();
     }
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.hide(chatFragment);
         transaction.hide(myToDoFragment);
-        transaction.hide(roomChatFragment);
         transaction.show(fragment);
-//        transaction.replace(R.id.fl_main, fragment);
         transaction.commit();
     }
 
@@ -111,40 +107,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onBackPressed();
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.top_app_bar, menu);
-//        searchView = (SearchView) menu.findItem(R.id.it_search).getActionView();
-//        setupSearchBar();
-        return true;
-    }
-
-    private void setupSearchBar() {
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return true;
-            }
-        });
-    }
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.it_my_todo:
                 showFragment(myToDoFragment);
-                break;
-            case R.id.it_group_todo:
-                showFragment(groupToDoFragment);
+                setTitle(myToDoFragment.getTitle());
                 break;
             case R.id.it_chat:
-                showFragment(roomChatFragment);
+                showFragment(chatFragment);
+                setTitle(chatFragment.getTitle());
                 break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -156,13 +128,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ln_nav_header:
-
+                Intent intent = new Intent(this, ProflieActivity.class);
+                startActivity(intent);
                 break;
         }
-    }
-
-    public MaterialToolbar getToolbar() {
-        return toolbar;
     }
 
 }

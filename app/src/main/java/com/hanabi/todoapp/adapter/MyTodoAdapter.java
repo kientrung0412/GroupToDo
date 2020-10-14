@@ -27,7 +27,6 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
     private ArrayList<Todo> data;
     private OnClickMyTodoListener listener;
 
-    private int isFirstDone;
 
     public MyTodoAdapter(LayoutInflater layoutInflater) {
         this.layoutInflater = layoutInflater;
@@ -39,20 +38,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
     public void setData(ArrayList<Todo> data) {
         this.data = data;
-        isFirstDone = 0;
-        sortData();
         notifyDataSetChanged();
-    }
-
-    private void sortData() {
-        Collections.sort(this.data, (todo1, todo2) -> {
-            int result = todo1.getStatus() - todo2.getStatus();
-            if (result != 0) {
-                return (int) result;
-            }
-            result = (int) (todo2.getId() - todo1.getId());
-            return (int) result;
-        });
     }
 
     public ArrayList<Todo> getData() {
@@ -71,9 +57,6 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
     public void onBindViewHolder(@NonNull HolderMyTodo holder, int position) {
 
         final Todo todo = data.get(position);
-        if (todo.getStatus() == Todo.TODO_STATUS_DONE) {
-            isFirstDone++;
-        }
         holder.bindView(todo);
 
         if (listener != null) {
@@ -123,16 +106,10 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
             String dateStr = dateFormat.format(todo.getCreatedAt());
             tvTime.setText(dateStr);
 
-//            if (isFirstDone == 1) {
-//                tvContent.setTextColor(Color.RED);
-//            } else {
-//                tvContent.setTextColor(Color.BLACK);
-//            }
-
             switch (todo.getStatus()) {
                 case Todo.TODO_STATUS_NEW:
                     cbDone.setChecked(false);
-                    if ((tvContent.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0){
+                    if ((tvContent.getPaintFlags() & Paint.STRIKE_THRU_TEXT_FLAG) > 0) {
                         tvContent.setPaintFlags(tvContent.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     }
                     break;

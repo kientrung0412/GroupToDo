@@ -4,33 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item android:title="@string/todo">
-        <menu>
-            <item
-                android:id="@+id/it_my_todo"
-                android:icon="@drawable/ic_work"
-                android:title="@string/my_todo" />
-
-            <item
-                android:id="@+id/it_group_todo"
-                android:title="@string/group_todo" />
-        </menu>
-    </item>
+    <item
+        android:id="@+id/it_my_todo"
+        android:icon="@drawable/ic_work"
+        android:title="@string/my_todo" />
 
     <item
         android:id="@+id/it_chat"
         android:icon="@drawable/ic_chat"
         android:title="@string/message" />
 
-    <item android:title="@string/app_name" />
-    <item android:title="@string/app_name" />
-
-
-    <item android:title="Demo">
-        <menu>
-            <item android:title="@string/app_name" />
-            <item android:title="@string/app_name" />
-            <item android:title="@string/app_name" />
-        </menu>
-    </item>
 </menu>

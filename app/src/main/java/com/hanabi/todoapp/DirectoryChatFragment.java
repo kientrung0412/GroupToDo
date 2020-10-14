@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link RoomChatFragment#newInstance} factory method to
+ * Use the {@link DirectoryChatFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomChatFragment extends Fragment {
+public class DirectoryChatFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +24,7 @@ public class RoomChatFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public RoomChatFragment() {
+    public DirectoryChatFragment() {
         // Required empty public constructor
     }
 
@@ -34,11 +34,11 @@ public class RoomChatFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment RoomChatFragment.
+     * @return A new instance of fragment DirectoryChatFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static RoomChatFragment newInstance(String param1, String param2) {
-        RoomChatFragment fragment = new RoomChatFragment();
+    public static DirectoryChatFragment newInstance(String param1, String param2) {
+        DirectoryChatFragment fragment = new DirectoryChatFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -59,6 +59,6 @@ public class RoomChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_room_chat, container, false);
+        return inflater.inflate(R.layout.fragment_directory_chat, container, false);
     }
 }

@@ -1,8 +1,8 @@
 package com.hanabi.todoapp.models;
 
-import android.os.SystemClock;
-
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Todo {
 
@@ -11,7 +11,6 @@ public class Todo {
     public static final int TODO_STATUS_DONE = 2;
 
     public static final String TODO_COLL_MY_TODO = "my_todo";
-    public static final String TODO_COLL_GROUP_TODO = "group_todo";
     public static final String TODO_COLL = "todo";
 
     public static final int LOOP_DAYS = 1;
@@ -22,10 +21,10 @@ public class Todo {
     private long id = System.currentTimeMillis();
     private String content;
     private int status;
-    private Boolean isLoop = false;
     private int typeLoop;
     private Date createdAt = new Date();
     private Date promptDate = null;
+    private Map<String, Object> loopTodoMap = new HashMap<>();
 
     public long getId() {
         return id;
@@ -51,14 +50,6 @@ public class Todo {
         this.status = status;
     }
 
-    public Boolean getLoop() {
-        return isLoop;
-    }
-
-    public void setLoop(Boolean loop) {
-        isLoop = loop;
-    }
-
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -81,6 +72,14 @@ public class Todo {
 
     public void setTypeLoop(int typeLoop) {
         this.typeLoop = typeLoop;
+    }
+
+    public Map<String, Object> getLoopTodoMap() {
+        return loopTodoMap;
+    }
+
+    public void setLoopTodoMap(Map<String, Object> loopTodoMap) {
+        this.loopTodoMap = loopTodoMap;
     }
 
     public void toEquals(Todo originalTodo) {
