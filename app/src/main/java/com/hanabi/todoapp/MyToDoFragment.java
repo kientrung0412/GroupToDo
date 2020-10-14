@@ -26,6 +26,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -65,10 +66,11 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private SwipeRefreshLayout srlReload;
     private FloatingActionButton fabAdd;
 
-    private LinearLayout llAddTodo;
+    private LinearLayout llAddTodo, llMore;
     private Chip cpLoop, cpTime, cpPrompt;
     private ImageView ivAdd;
     private EditText edtContent;
+    private TextView tvCountDone;
 
     private InputMethodManager imm;
     private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
@@ -125,10 +127,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         return llAddTodo;
     }
 
-    public InputMethodManager getImm() {
-        return imm;
-    }
-
     public FloatingActionButton getFabAdd() {
         return fabAdd;
     }
@@ -145,11 +143,13 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         setHasOptionsMenu(true);
         imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
 
+        tvCountDone = getActivity().findViewById(R.id.tv_count_done);
         rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new);
         rcvTodoDone = getActivity().findViewById(R.id.rcv_my_todo_done);
         srlReload = getActivity().findViewById(R.id.srl_loading_my_todo);
         fabAdd = getActivity().findViewById(R.id.fab_add_my_todo);
-        llAddTodo = getActivity().findViewById(R.id.ln_add_my_todo);
+        llAddTodo = getActivity().findViewById(R.id.ll_add_my_todo);
+        llMore = getActivity().findViewById(R.id.ll_more);
         ivAdd = getActivity().findViewById(R.id.iv_add_my_todo);
         edtContent = getActivity().findViewById(R.id.edt_content);
         cpLoop = getActivity().findViewById(R.id.cp_set_loop_todo);
@@ -158,8 +158,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
 
         adapterNew = new MyTodoAdapter(getLayoutInflater());
         adapterDone = new MyTodoAdapter(getLayoutInflater());
-
-        ((SimpleItemAnimator) rcvTodoNew.getItemAnimator()).setSupportsChangeAnimations(false);
 
         rcvTodoNew.setHasFixedSize(true);
         rcvTodoNew.setNestedScrollingEnabled(false);
@@ -171,6 +169,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         cpLoop.setOnClickListener(this);
         cpTime.setOnClickListener(this);
         cpPrompt.setOnClickListener(this);
+        llMore.setOnClickListener(this);
         cpLoop.setOnCloseIconClickListener(this);
         cpTime.setOnCloseIconClickListener(this);
         cpPrompt.setOnCloseIconClickListener(this);
@@ -182,7 +181,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         rcvTodoNew.setAdapter(adapterNew);
         rcvTodoDone.setAdapter(adapterDone);
 
-//        getActivity().setTitle("Hôm nay");
+        getActivity().setTitle("Hôm nay");
 
         new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvTodoNew);
         new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(rcvTodoDone);
@@ -209,6 +208,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private void loadingData() {
         getTodos(adapterNew, Todo.TODO_STATUS_NEW);
         getTodos(adapterDone, Todo.TODO_STATUS_DONE);
+
     }
 
     private void getTodos(MyTodoAdapter adapter, int status) {
@@ -223,12 +223,21 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                         ArrayList<Todo> todos = new ArrayList<>();
                         if (queryDocumentSnapshots.isEmpty()) {
                             adapter.setData(todos);
+                            if (status == Todo.TODO_STATUS_DONE) {
+                                llMore.setVisibility(View.GONE);
+                            }
                             return;
                         }
+
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                             Todo todo = document.toObject(Todo.class);
                             todos.add(todo);
                             adapter.setData(todos);
+                        }
+
+                        if (status == Todo.TODO_STATUS_DONE) {
+                            llMore.setVisibility(View.VISIBLE);
+                            tvCountDone.setText(adapter.getItemCount() + "");
                         }
                     }
                 })
@@ -331,6 +340,17 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 resetDataForm();
 
                 break;
+
+            case R.id.ll_more:
+                if (rcvTodoDone.getVisibility() == View.VISIBLE) {
+                    rcvTodoDone.setVisibility(View.GONE);
+                    return;
+                }
+                if (rcvTodoDone.getVisibility() == View.GONE) {
+                    rcvTodoDone.setVisibility(View.VISIBLE);
+                    return;
+                }
+
             default:
                 showPopupMemu(view);
         }
@@ -463,7 +483,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     }
 
     private void pickDateCreater() {
-
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);

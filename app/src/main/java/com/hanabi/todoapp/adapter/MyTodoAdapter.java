@@ -22,7 +22,7 @@ import java.util.Collections;
 
 public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTodo> {
 
-    public static final String TAG = MyTodoAdapter.class.getName();
+
     private LayoutInflater layoutInflater;
     private ArrayList<Todo> data;
     private OnClickMyTodoListener listener;
