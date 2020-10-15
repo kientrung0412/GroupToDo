@@ -8,6 +8,10 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.work.BackoffPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +25,10 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.hanabi.todoapp.dao.Database;
+import com.hanabi.todoapp.utils.MessageNotification;
+import com.hanabi.todoapp.works.LoopWork;
+
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -39,12 +47,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MyToDoFragment myToDoFragment = new MyToDoFragment();
     private ChatFragment chatFragment = new ChatFragment();
 
+    private LoopWork loopWork;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
+        setupWork();
+        setupNotification();
+    }
+
+    private void setupNotification() {
+        MessageNotification manageNotification = new MessageNotification(this);
+
+    }
+
+    private void setupWork() {
+         PeriodicWorkRequest periodicWork =
+                new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 15, TimeUnit.MINUTES)
+                        .setBackoffCriteria(
+                                BackoffPolicy.LINEAR,
+                                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                                TimeUnit.MILLISECONDS)
+                        .build();
+         WorkManager.getInstance(this).enqueue(periodicWork);
     }
 
     private void initViews() {

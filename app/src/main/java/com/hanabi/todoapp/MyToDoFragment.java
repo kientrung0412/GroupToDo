@@ -72,7 +72,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private LoopTodo loopTodo = new LoopTodo();
 
     private Boolean isLoop = false;
-    private Date prompt, createdAt = null;
+    private Date remindDate, createdAt = null;
 
     private TodoDao todoDao = new TodoDao(getActivity());
 
@@ -107,7 +107,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         edtContent = getActivity().findViewById(R.id.edt_content);
         cpLoop = getActivity().findViewById(R.id.cp_set_loop_todo);
         cpTime = getActivity().findViewById(R.id.cp_set_time_todo);
-        cpPrompt = getActivity().findViewById(R.id.cp_set_prompt);
+        cpPrompt = getActivity().findViewById(R.id.cp_set_remind);
 
         adapterNew = new MyTodoAdapter(getLayoutInflater());
         adapterDone = new MyTodoAdapter(getLayoutInflater());
@@ -184,7 +184,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 if (createdAt != null) {
                     todo.setCreatedAt(createdAt);
                 }
-                todo.setPromptDate(prompt);
+                todo.setRemindDate(remindDate);
                 todo.setLoopTodoMap(loopTodo.toMap());
                 todo.setLoop(isLoop);
 
@@ -211,7 +211,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private void resetDataForm() {
         isLoop = false;
         createdAt = null;
-        prompt = null;
+        remindDate = null;
         loopTodo.reset();
         edtContent.setText("");
         cpLoop.setText("Lặp lại");
@@ -226,9 +226,12 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     public void onChangeCheckbox(Todo todo) {
         switch (todo.getStatus()) {
             case Todo.TODO_STATUS_NEW:
-                todoDao.doneTodo(todo);
+                todo.setCompletedDate(now);
+                todo.setStatus(Todo.TODO_STATUS_DONE);
+                todoDao.updateTodo(todo);
                 break;
             case Todo.TODO_STATUS_DONE:
+                todo.setCompletedDate(null);
                 todo.setStatus(Todo.TODO_STATUS_NEW);
                 todoDao.updateTodo(todo);
                 break;
@@ -266,7 +269,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 }
                 popupMenu.inflate(R.menu.menu_loop_todo);
                 break;
-            case R.id.cp_set_prompt:
+            case R.id.cp_set_remind:
                 break;
             case R.id.cp_set_time_todo:
                 if (cpTime.isCloseIconVisible()) {
@@ -444,7 +447,6 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                         new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
                                 .addSwipeLeftActionIcon(R.drawable.ic_delete)
                                 .addSwipeLeftBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorDanger))
-                                .addSwipeLeftLabel("Xóa bỏ")
                                 .setSwipeLeftLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
                                 .create()
                                 .decorate();

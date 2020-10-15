@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hanabi.todoapp.adapter.RoomChatAdapter;
+import com.hanabi.todoapp.dao.TodoDao;
 
 public class ChatFragment extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener {
 
@@ -39,6 +40,8 @@ public class ChatFragment extends Fragment implements SearchView.OnQueryTextList
         super.onActivityCreated(savedInstanceState);
         initViews();
         loadingAdapter();
+
+
     }
 
     private void initViews() {

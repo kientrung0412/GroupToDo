@@ -12,13 +12,13 @@ public class Todo {
     public static final String TODO_COLL_MY_TODO = "my_todo";
     public static final String TODO_COLL = "todo";
 
-
     private long id = System.currentTimeMillis();
     private String content;
     private int status;
     private Date createdAt = new Date();
     private Boolean isLoop = false;
-    private Date promptDate = null;
+    private Date remindDate = null;
+    private Date completedDate = null;
     private Map<String, Object> loopTodoMap = new HashMap<>();
 
     public long getId() {
@@ -53,12 +53,12 @@ public class Todo {
         this.createdAt = createdAt;
     }
 
-    public Date getPromptDate() {
-        return promptDate;
+    public Date getRemindDate() {
+        return remindDate;
     }
 
-    public void setPromptDate(Date promptDate) {
-        this.promptDate = promptDate;
+    public void setRemindDate(Date remindDate) {
+        this.remindDate = remindDate;
     }
 
     public Map<String, Object> getLoopTodoMap() {
@@ -73,6 +73,14 @@ public class Todo {
         return isLoop;
     }
 
+    public Date getCompletedDate() {
+        return completedDate;
+    }
+
+    public void setCompletedDate(Date completedDate) {
+        this.completedDate = completedDate;
+    }
+
     public void setLoop(Boolean loop) {
         isLoop = loop;
     }
@@ -83,7 +91,8 @@ public class Todo {
         setContent(originalTodo.getContent());
         setCreatedAt(originalTodo.getCreatedAt());
         setLoop(originalTodo.getLoop());
-        setPromptDate(originalTodo.getPromptDate());
+        setRemindDate(originalTodo.getRemindDate());
         setLoopTodoMap(originalTodo.getLoopTodoMap());
+        setCompletedDate(originalTodo.getCompletedDate());
     }
 }
