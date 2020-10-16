@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 public class TodoDao {
 
+    public static ArrayList<Todo> todos = new ArrayList<>();
+
     private Calendar calendarNow = Calendar.getInstance();
     private Activity activity;
     private DataChangeListener listener;
@@ -192,7 +194,6 @@ public class TodoDao {
     }
 
     public void realtimeUpdate() {
-
         reference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
@@ -203,6 +204,9 @@ public class TodoDao {
                 listener.realtimeUpdateSuccess();
             }
         });
+    }
+
+    public void remindTodo() {
 
     }
 
@@ -218,6 +222,9 @@ public class TodoDao {
         void deleteTodoSuccess(Todo todo);
 
         void realtimeUpdateSuccess();
+    }
+
+    public interface RemindListener {
 
     }
 }

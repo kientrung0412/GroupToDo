@@ -34,6 +34,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.adapter.MyTodoAdapter;
 import com.hanabi.todoapp.dao.TodoDao;
+import com.hanabi.todoapp.dialog.RemindPickDatedialog;
 import com.hanabi.todoapp.models.LoopTodo;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.utils.ManageDate;
@@ -59,13 +60,14 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
     private FloatingActionButton fabAdd;
 
     private LinearLayout llAddTodo, llMore;
-    private Chip cpLoop, cpTime, cpPrompt;
+    private Chip cpLoop, cpTime, cpRemind;
     private ImageView ivAdd;
     private EditText edtContent;
     private TextView tvCountDone;
 
     private InputMethodManager imm;
     private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+    private DateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
     private ManageDate manageDate = new ManageDate();
     private Calendar calendar = Calendar.getInstance();
     private Date now = calendar.getTime();
@@ -107,7 +109,7 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         edtContent = getActivity().findViewById(R.id.edt_content);
         cpLoop = getActivity().findViewById(R.id.cp_set_loop_todo);
         cpTime = getActivity().findViewById(R.id.cp_set_time_todo);
-        cpPrompt = getActivity().findViewById(R.id.cp_set_remind);
+        cpRemind = getActivity().findViewById(R.id.cp_set_remind);
 
         adapterNew = new MyTodoAdapter(getLayoutInflater());
         adapterDone = new MyTodoAdapter(getLayoutInflater());
@@ -121,11 +123,11 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         ivAdd.setOnClickListener(this);
         cpLoop.setOnClickListener(this);
         cpTime.setOnClickListener(this);
-        cpPrompt.setOnClickListener(this);
+        cpRemind.setOnClickListener(this);
         llMore.setOnClickListener(this);
         cpLoop.setOnCloseIconClickListener(this);
         cpTime.setOnCloseIconClickListener(this);
-        cpPrompt.setOnCloseIconClickListener(this);
+        cpRemind.setOnCloseIconClickListener(this);
         adapterNew.setListener(this);
         adapterDone.setListener(this);
         srlReload.setOnRefreshListener(this);
@@ -220,6 +222,9 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
         cpTime.setText("Đặt lịch");
         cpTime.setCloseIconVisible(false);
         cpTime.setChipBackgroundColorResource(R.color.colorGray);
+        cpRemind.setText("Nhắc nhở");
+        cpRemind.setCloseIconVisible(false);
+        cpRemind.setChipBackgroundColorResource(R.color.colorGray);
     }
 
     @Override
@@ -270,6 +275,17 @@ public class MyToDoFragment extends Fragment implements MyTodoAdapter.OnClickMyT
                 popupMenu.inflate(R.menu.menu_loop_todo);
                 break;
             case R.id.cp_set_remind:
+                if (cpRemind.isCloseIconVisible()) {
+                    chipClick(cpRemind, "Nhắc nhở");
+                    remindDate = null;
+                    return;
+                }
+                RemindPickDatedialog pickDatedialog = new RemindPickDatedialog(getActivity());
+                pickDatedialog.showDialog();
+                pickDatedialog.setListener(date -> {
+                    remindDate = date;
+                    chipClick(cpRemind, dateTimeFormat.format(date));
+                });
                 break;
             case R.id.cp_set_time_todo:
                 if (cpTime.isCloseIconVisible()) {

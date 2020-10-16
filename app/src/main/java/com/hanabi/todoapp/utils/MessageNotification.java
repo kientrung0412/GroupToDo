@@ -1,54 +1,37 @@
 package com.hanabi.todoapp.utils;
 
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.RemoteInput;
-import android.content.Context;
-import android.os.Build;
+import android.content.Intent;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
+import com.hanabi.todoapp.MainActivity;
 import com.hanabi.todoapp.R;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
+public class MessageNotification extends BaseNotification {
 
-public class MessageNotification {
-    private static final String CHANNEL_ID = "channel_message";
+    public static final int NOTIFICATION_ID = 1;
+    public static final String CHANNEL_ID = "CHANNEL_MESSAGE";
+    private String name = "Tin nhắn";
+    private String description = "Thông báo tin nhắn đến";
+    private int smallIcon = R.drawable.ic_chat;
     private Activity activity;
 
     public MessageNotification(Activity activity) {
+        super(activity, NOTIFICATION_ID, CHANNEL_ID);
         this.activity = activity;
     }
 
+    @Override
+    public void builderNotification(String title, String content, int smallIcon) {
+        super.builderNotification(title, content, smallIcon);
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra("name", "trung");
+        PendingIntent pendingIntent = PendingIntent.getActivity(activity, MainActivity.REQUEST_CODE_OFF, intent, Intent.FILL_IN_ACTION);
+        getBuilder().addAction(R.drawable.ic_calendar, "Gia hạn", pendingIntent);
+
+    }
+
     public void showNotification(String title, String content) {
-        createNotificationChannel();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_message)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(activity);
-        notificationManager.notify(1, builder.build());
+        super.showNotification(title, content, smallIcon, description, name);
     }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Message";
-            String description = "Receive message";
-
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-
-            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, name, importance);
-            notificationChannel.setDescription(description);
-
-            NotificationManager notificationManager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.createNotificationChannel(notificationChannel);
-        }
-    }
-
-
 }

@@ -1,6 +1,7 @@
 package com.hanabi.todoapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -13,12 +14,15 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
@@ -35,6 +39,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
+    public static final int REQUEST_CODE_OFF = 1;
+
     private MaterialToolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationViewl;
@@ -47,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MyToDoFragment myToDoFragment = new MyToDoFragment();
     private ChatFragment chatFragment = new ChatFragment();
 
-    private LoopWork loopWork;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,19 +64,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupNotification() {
-        MessageNotification manageNotification = new MessageNotification(this);
-
+        MessageNotification notification = new MessageNotification(this);
+        notification.showNotification("Demo", "Nguyễn kiên trung");
     }
 
     private void setupWork() {
-         PeriodicWorkRequest periodicWork =
+        PeriodicWorkRequest periodicWork =
                 new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 15, TimeUnit.MINUTES)
                         .setBackoffCriteria(
                                 BackoffPolicy.LINEAR,
                                 OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
                                 TimeUnit.MILLISECONDS)
                         .build();
-         WorkManager.getInstance(this).enqueue(periodicWork);
+        WorkManager.getInstance(this).enqueue(periodicWork);
     }
 
     private void initViews() {
@@ -160,4 +165,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_OFF) {
+            if (resultCode == Activity.RESULT_OK) {
+                data.getExtras();
+            }
+        }
+    }
 }
