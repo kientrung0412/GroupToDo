@@ -16,7 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class RemindPickDatedialog implements View.OnClickListener {
+public class RemindPickDateDialog implements View.OnClickListener {
 
     private Activity activity;
     private AlertDialog dialog;
@@ -29,7 +29,7 @@ public class RemindPickDatedialog implements View.OnClickListener {
         this.listener = listener;
     }
 
-    public RemindPickDatedialog(Activity activity) {
+    public RemindPickDateDialog(Activity activity) {
         this.activity = activity;
     }
 
@@ -89,11 +89,13 @@ public class RemindPickDatedialog implements View.OnClickListener {
                 break;
             case R.id.tv_save:
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
                 int day = datePicker.getDayOfMonth();
                 int month = datePicker.getMonth() + 1;
                 int year = datePicker.getYear();
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
+
                 String dataString = String.format("%s/%s/%s %s:%s", day, month, year, hour, minute);
                 try {
                     Date date = simpleDateFormat.parse(dataString);

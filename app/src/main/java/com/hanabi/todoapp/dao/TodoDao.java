@@ -1,6 +1,7 @@
 package com.hanabi.todoapp.dao;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -8,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -16,20 +18,19 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.models.Todo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class TodoDao {
 
-    public static ArrayList<Todo> todos = new ArrayList<>();
+    public static ArrayList<Todo> todos;
 
     private Calendar calendarNow = Calendar.getInstance();
     private Activity activity;
     private DataChangeListener listener;
+    private RemindTodoListener reminderListener;
     private CollectionReference reference = Database.getDb().collection(Todo.TODO_COLL)
             .document(Database.getFirebaseUser().getUid()).collection(Todo.TODO_COLL_MY_TODO);
 
@@ -40,8 +41,16 @@ public class TodoDao {
         this.activity = activity;
     }
 
+    public static ArrayList<Todo> getTodos() {
+        return todos;
+    }
+
     public void setListener(DataChangeListener listener) {
         this.listener = listener;
+    }
+
+    public void setReminderListener(RemindTodoListener reminderListener) {
+        this.reminderListener = reminderListener;
     }
 
     public void getTodos(Date startDate, Date endDate, int status) {
@@ -207,7 +216,50 @@ public class TodoDao {
     }
 
     public void remindTodo() {
+        reference
+                .whereNotEqualTo("remindDate", null)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        return;
+                    }
+                    todos = new ArrayList<>();
+                    for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                        Todo todo = document.toObject(Todo.class);
+                        todos.add(todo);
+                    }
+                    return;
+                })
+                .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
 
+    public void updateRemindTodo() {
+        reference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            Log.d("Demo", dc.getDocument().toString());
+                            break;
+                        case MODIFIED:
+                            Log.d("Demo2", dc.getDocument().toString());
+                            break;
+                        case REMOVED:
+                            Log.d("Demo3", dc.getDocument().toString());
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+            }
+        });
     }
 
     private void resetTodo(Todo todo) {
@@ -224,7 +276,7 @@ public class TodoDao {
         void realtimeUpdateSuccess();
     }
 
-    public interface RemindListener {
-
+    public interface RemindTodoListener {
+        void getTodoSuccess(ArrayList<Todo> todos);
     }
 }

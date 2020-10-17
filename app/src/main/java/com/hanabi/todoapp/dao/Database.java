@@ -16,7 +16,4 @@ public abstract class Database {
         return firebaseUser;
     }
 
-    public static void setFirebaseUser(FirebaseUser firebaseUser) {
-        Database.firebaseUser = firebaseUser;
-    }
 }

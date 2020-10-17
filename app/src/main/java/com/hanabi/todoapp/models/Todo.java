@@ -1,10 +1,11 @@
 package com.hanabi.todoapp.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Todo {
+public class Todo implements Serializable {
 
     public static final int TODO_STATUS_NEW = 1;
     public static final int TODO_STATUS_DONE = 2;

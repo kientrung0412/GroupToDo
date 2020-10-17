@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -17,7 +16,6 @@ import androidx.work.WorkManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -29,7 +27,9 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.hanabi.todoapp.dao.Database;
-import com.hanabi.todoapp.utils.MessageNotification;
+import com.hanabi.todoapp.dao.UserDao;
+import com.hanabi.todoapp.models.User;
+import com.hanabi.todoapp.sevice.RemindService;
 import com.hanabi.todoapp.works.LoopWork;
 
 import java.util.concurrent.TimeUnit;
@@ -41,16 +41,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public static final int REQUEST_CODE_OFF = 1;
 
+    public static final String EXTRA_DETAIL_TODO = "extra.DETAIL_TODO";
+
     private MaterialToolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationViewl;
-    private SearchView searchView;
     private LinearLayout lnNavHeader;
 
     private TextView tvEmail, tvName;
     private CircleImageView civAvatar;
 
-    private MyToDoFragment myToDoFragment = new MyToDoFragment();
+    private ToDoFragment toDoFragment = new ToDoFragment();
     private ChatFragment chatFragment = new ChatFragment();
 
 
@@ -60,13 +61,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         initViews();
         setupWork();
-        setupNotification();
+
+        UserDao userDao = new UserDao();
+        userDao.searchFriendByEmail("nguyenxuantube@gmail.com");
+        userDao.setDataQuery(new UserDao.GetDataQuery() {
+            @Override
+            public void getFriend(User user) {
+                Toast.makeText(MainActivity.this, user.getUid(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+//        setupService();
     }
 
-    private void setupNotification() {
-        MessageNotification notification = new MessageNotification(this);
-        notification.showNotification("Demo", "Nguyễn kiên trung");
+    private void setupService() {
+        Intent intent = new Intent(this, RemindService.class);
+        startService(intent);
     }
+
 
     private void setupWork() {
         PeriodicWorkRequest periodicWork =
@@ -80,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initViews() {
+        setTitle(toDoFragment.getTitleToolBar());
         toolbar = findViewById(R.id.tb_main);
         drawerLayout = findViewById(R.id.dl_main);
         navigationViewl = findViewById(R.id.nav_view);
@@ -99,20 +112,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         setupDrawer();
         initFragment();
-        showFragment(myToDoFragment);
+        showFragment(toDoFragment);
     }
 
     private void initFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fl_main, chatFragment);
-        transaction.add(R.id.fl_main, myToDoFragment);
+        transaction.add(R.id.fl_main, toDoFragment);
         transaction.commit();
     }
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.hide(chatFragment);
-        transaction.hide(myToDoFragment);
+        transaction.hide(toDoFragment);
         transaction.show(fragment);
         transaction.commit();
     }
@@ -126,11 +139,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
 
-        if (myToDoFragment.getLlAddTodo().getVisibility() == View.VISIBLE) {
-            myToDoFragment.getLlAddTodo().setVisibility(View.GONE);
-            myToDoFragment.getFabAdd().setVisibility(View.VISIBLE);
-            return;
-        }
+//        if (myToDoFragment.getLlAddTodo().getVisibility() == View.VISIBLE) {
+//            myToDoFragment.getLlAddTodo().setVisibility(View.GONE);
+//            myToDoFragment.getFabAdd().setVisibility(View.VISIBLE);
+//            return;
+//        }
 
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -143,7 +156,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.it_my_todo:
-                showFragment(myToDoFragment);
+                showFragment(toDoFragment);
+                setTitle(toDoFragment.getTitleToolBar());
                 break;
             case R.id.it_chat:
                 showFragment(chatFragment);

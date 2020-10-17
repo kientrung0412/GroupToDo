@@ -68,7 +68,7 @@ public class ManageDate {
         return getStingDayOfWeek(getDateNextTomorrow(date));
     }
 
-    public Date getNow(Date date) {
+    public Date getDate(Date date) {
         cal.setTime(date);
         String strNow = String.format("%s/%s/%s", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR));
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class LoopWork extends Worker {
     private TodoDao todoDao = new TodoDao();
 
-
-
     public LoopWork(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
