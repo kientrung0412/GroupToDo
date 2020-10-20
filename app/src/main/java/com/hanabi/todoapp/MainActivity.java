@@ -27,17 +27,22 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 import com.hanabi.todoapp.dao.Database;
+import com.hanabi.todoapp.dao.FriendDao;
 import com.hanabi.todoapp.dao.UserDao;
+import com.hanabi.todoapp.models.Friend;
 import com.hanabi.todoapp.models.User;
 import com.hanabi.todoapp.sevice.RemindService;
 import com.hanabi.todoapp.works.LoopWork;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     public static final int REQUEST_CODE_OFF = 1;
 
@@ -61,15 +66,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         initViews();
         setupWork();
-
-        UserDao userDao = new UserDao();
-        userDao.searchFriendByEmail("nguyenxuantube@gmail.com");
-        userDao.setDataQuery(new UserDao.GetDataQuery() {
-            @Override
-            public void getFriend(User user) {
-                Toast.makeText(MainActivity.this, user.getUid(), Toast.LENGTH_SHORT).show();
-            }
-        });
 
 //        setupService();
     }

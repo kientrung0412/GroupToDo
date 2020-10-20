@@ -93,7 +93,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
         public HolderMyTodo(@NonNull View itemView) {
             super(itemView);
-            tvContent = itemView.findViewById(R.id.tv_content_todo);
+            tvContent = itemView.findViewById(R.id.edt_content_todo);
             ivLoop = itemView.findViewById(R.id.iv_loop);
 //            tvTime = itemView.findViewById(R.id.tv_todo_create_at);
             cbDone = itemView.findViewById(R.id.cb_done);

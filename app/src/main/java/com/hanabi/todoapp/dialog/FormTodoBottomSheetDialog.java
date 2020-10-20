@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -16,7 +14,6 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -60,7 +57,7 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         BottomSheetDialog bottomSheet = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
 
-        View view = View.inflate(getContext(), R.layout.dialog_add_my_todo, null);
+        View view = View.inflate(getContext(), R.layout.dialog_add_todo, null);
         edtContent = view.findViewById(R.id.edt_content);
         cpLoop = view.findViewById(R.id.cp_set_loop_todo);
         cpTime = view.findViewById(R.id.cp_set_time_todo);
@@ -124,16 +121,12 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
                     remindDate = null;
                     return;
                 }
-
-                popupMenu = new PopupMenu(getActivity(), view);
                 RemindPickDateDialog pickDatedialog = new RemindPickDateDialog(getActivity());
                 pickDatedialog.showDialog();
                 pickDatedialog.setListener(date -> {
                     remindDate = date;
                     chipClick(cpRemind, dateTimeFormat.format(date));
                 });
-                popupMenu.setOnMenuItemClickListener(this);
-                popupMenu.show();
                 break;
             case R.id.cp_set_time_todo:
                 if (cpTime.isCloseIconVisible()) {
@@ -179,9 +172,10 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
                 chipClick(cpLoop, "Mỗi ngày");
                 break;
             case R.id.it_loop_week:
+                loopTodo.setMonday(true);
                 loopTodo.setDays(7);
                 isLoop = true;
-                chipClick(cpLoop, "Mỗi tuần vào " + manageDate.getStingDayOfWeek(now));
+                chipClick(cpLoop, "Mỗi tuần vào Thứ Hai");
                 break;
             case R.id.it_loop_moth:
                 loopTodo.setMonths(1);

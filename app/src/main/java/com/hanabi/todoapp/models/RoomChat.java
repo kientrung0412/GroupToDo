@@ -1,13 +1,25 @@
 package com.hanabi.todoapp.models;
 
+import java.util.Date;
 import java.util.List;
 
 public class RoomChat {
 
+    public static final String NAME_COLL = "room";
+
     private String roomId;
-    private List<String> userIds;
-    private List<Message> messages;
-    private Boolean isGroup = false;
+    private String roomName;
+    private String createdBy;
+    private Date createdAt;
+    private List<String> usersId;
+    private String roomImageUrl;
+
+    public RoomChat() {
+    }
+
+    public static String getNameColl() {
+        return NAME_COLL;
+    }
 
     public String getRoomId() {
         return roomId;
@@ -17,27 +29,43 @@ public class RoomChat {
         this.roomId = roomId;
     }
 
-    public List<String> getUserIds() {
-        return userIds;
+    public String getRoomName() {
+        return roomName;
     }
 
-    public void setUserIds(List<String> userIds) {
-        this.userIds = userIds;
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
     }
 
-    public List<Message> getMessages() {
-        return messages;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public Boolean getGroup() {
-        return isGroup;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setGroup(Boolean group) {
-        isGroup = group;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<String> getUsersId() {
+        return usersId;
+    }
+
+    public void setUsersId(List<String> usersId) {
+        this.usersId = usersId;
+    }
+
+    public String getRoomImageUrl() {
+        return roomImageUrl;
+    }
+
+    public void setRoomImageUrl(String roomImageUrl) {
+        this.roomImageUrl = roomImageUrl;
     }
 }

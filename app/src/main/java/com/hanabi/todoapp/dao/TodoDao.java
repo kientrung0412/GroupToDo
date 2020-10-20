@@ -106,62 +106,66 @@ public class TodoDao {
                         boolean saturday = Boolean.parseBoolean(String.valueOf(map.get("saturday")));
                         boolean sunday = Boolean.parseBoolean(String.valueOf(map.get("sunday")));
 
-                        if (sunday) {
-                            if (calendarNow.get(Calendar.DAY_OF_WEEK) == 1) {
-                                resetTodo(todo);
-                                return;
-                            }
-                        }
-                        if (monday) {
-                            if (calendarNow.get(Calendar.DAY_OF_WEEK) == 2) {
-                                resetTodo(todo);
-                                return;
-                            }
-                        }
-                        if (tuesday) {
-                            if (calendarNow.get(Calendar.DAY_OF_WEEK) == 3) {
-                                resetTodo(todo);
-                                return;
-                            }
-                        }
-                        if (wednesday) {
-                            if (calendarNow.get(Calendar.DAY_OF_WEEK) == 4) {
-                                resetTodo(todo);
-                                return;
-                            }
-                        }
-                        if (thursday) {
-                            if (calendarNow.get(Calendar.DAY_OF_WEEK) == 5) {
-                                resetTodo(todo);
-                                return;
-                            }
-                        }
-                        if (friday) {
-                            if (calendarNow.get(Calendar.DAY_OF_WEEK) == 6) {
-                                resetTodo(todo);
-                                return;
-                            }
-                        }
-
-                        if (saturday) {
-                            if (calendarNow.get(Calendar.DAY_OF_WEEK) == 7) {
-                                resetTodo(todo);
-                                return;
-                            }
-                        }
-
-                        if (days == 1) {
-                            resetTodo(todo);
-                            return;
-                        }
-
-                        if (days > 1) {
+                        if (days > 1 && days % 7 != 0) {
                             long diff = calendarNow.getTimeInMillis() - todo.getCreatedAt().getTime();
                             int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
                             if (day % days == 0) {
                                 resetTodo(todo);
                             }
                             return;
+                        }
+
+                        if (days % 7 == 0) {
+//                            long diff = calendarNow.getTimeInMillis() - todo.getCreatedAt().getTime();
+//                            int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+//                            if (day == days) {
+                            if (sunday) {
+                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 1) {
+                                    resetTodo(todo);
+                                    return;
+                                }
+                            }
+                            if (monday) {
+                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 2) {
+                                    resetTodo(todo);
+                                    return;
+                                }
+                            }
+                            if (tuesday) {
+                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 3) {
+                                    resetTodo(todo);
+                                    return;
+                                }
+                            }
+                            if (wednesday) {
+                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 4) {
+                                    resetTodo(todo);
+                                    return;
+                                }
+                            }
+                            if (thursday) {
+                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 5) {
+                                    resetTodo(todo);
+                                    return;
+                                }
+                            }
+                            if (friday) {
+                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 6) {
+                                    resetTodo(todo);
+                                    return;
+                                }
+                            }
+                            if (saturday) {
+                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 7) {
+                                    resetTodo(todo);
+                                    return;
+                                }
+                            }
+                            if (days == 1) {
+                                resetTodo(todo);
+                                return;
+                            }
+//                            }
                         }
 
                         if (months > 0) {

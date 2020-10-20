@@ -10,6 +10,53 @@
     android:paddingTop="4dp"
     android:paddingBottom="16dp">
 
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:singleLine="true">
+
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cp_set_remind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:paddingHorizontal="8dp"
+                android:text="Nhắc nhở"
+                android:textSize="12sp"
+                app:chipIcon="@drawable/ic_bell_color" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cp_set_time_todo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:paddingHorizontal="8dp"
+                android:text="Đặt lịch"
+                android:textSize="12sp"
+                app:chipIcon="@drawable/ic_calendar" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cp_set_loop_todo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:paddingHorizontal="8dp"
+                android:text="Lặp lại"
+                android:textSize="12sp"
+                app:chipIcon="@drawable/ic_loop" />
+
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </HorizontalScrollView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,50 +87,4 @@
             android:src="@drawable/ic_send" />
     </LinearLayout>
 
-    <HorizontalScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scrollbars="none">
-
-        <com.google.android.material.chip.ChipGroup
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            app:singleLine="true">
-
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/cp_set_remind"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:paddingHorizontal="8dp"
-                android:text="Nhắc nhở"
-                android:textSize="12sp"
-                app:chipIcon="@drawable/ic_bell" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/cp_set_time_todo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:paddingHorizontal="8dp"
-                android:text="Đặt lịch"
-                android:textSize="12sp"
-                app:chipIcon="@drawable/ic_calendar" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/cp_set_loop_todo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:paddingHorizontal="8dp"
-                android:text="Lặp lại"
-                android:textSize="12sp"
-                app:chipIcon="@drawable/ic_loop" />
-
-
-        </com.google.android.material.chip.ChipGroup>
-
-    </HorizontalScrollView>
 </LinearLayout>

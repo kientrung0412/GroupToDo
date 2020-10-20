@@ -1,36 +1,41 @@
 package com.hanabi.todoapp.models;
 
+import android.provider.Settings;
+
 import java.util.Date;
 
 public class Message {
 
-    private String content;
-    private String userId;
+    private String messageId = String.valueOf(System.currentTimeMillis());
+    private String messageContent;
+    private String createdBy;
     private Date createdAt = new Date();
 
     public Message() {
     }
 
-    public Message(String content, String userId, Date createdAt) {
-        this.content = content;
-        this.userId = userId;
-        this.createdAt = createdAt;
+    public String getMessageId() {
+        return messageId;
     }
 
-    public String getContent() {
-        return content;
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public String getMessageContent() {
+        return messageContent;
     }
 
-    public String getUserId() {
-        return userId;
+    public void setMessageContent(String messageContent) {
+        this.messageContent = messageContent;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public Date getCreatedAt() {

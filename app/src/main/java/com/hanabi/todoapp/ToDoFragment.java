@@ -78,8 +78,6 @@ public class ToDoFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
-
-
         tvCountDone = getActivity().findViewById(R.id.tv_count_done);
         rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new);
         rcvTodoDone = getActivity().findViewById(R.id.rcv_my_todo_done);
@@ -150,6 +148,7 @@ public class ToDoFragment extends Fragment
                 }
                 if (rcvTodoDone.getVisibility() == View.GONE) {
                     rcvTodoDone.setVisibility(View.VISIBLE);
+                    setAnimation(rcvTodoDone);
                     return;
                 }
         }
@@ -181,7 +180,6 @@ public class ToDoFragment extends Fragment
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_todo, menu);
     }
 
@@ -218,7 +216,7 @@ public class ToDoFragment extends Fragment
                     Todo todo = document.toObject(Todo.class);
                     todos.add(todo);
                 }
-                adapterDone.setData(todos);
+                setAnimation(rcvTodoDone);
                 adapterDone.setData(todos);
                 llMore.setVisibility(View.VISIBLE);
                 tvCountDone.setText(adapterDone.getItemCount() + "");
