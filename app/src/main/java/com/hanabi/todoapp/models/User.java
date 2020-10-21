@@ -2,7 +2,9 @@ package com.hanabi.todoapp.models;
 
 import com.google.firebase.auth.FirebaseUser;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     public final static String NAME_COLL = "users";
 

@@ -35,8 +35,11 @@ import com.hanabi.todoapp.dao.UserDao;
 import com.hanabi.todoapp.dialog.LoadingDialog;
 import com.hanabi.todoapp.models.User;
 
+import java.io.Serializable;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String EXTRA_USER = "extra.USER";
     private static final int RC_SIGN_IN = 1;
     private Button btnLoginGoogle;
     private Button btnLoginFacebook;
@@ -54,7 +57,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
 //            loadingDialog.startLoadingdialog();
-            updateUI();
+            User u = new User();
+            u.toUser(user);
+            updateUI(u);
         }
     }
 
@@ -145,8 +150,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void updateUI() {
+    private void updateUI(User user) {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(EXTRA_USER, user);
         startActivity(intent);
         finish();
     }
@@ -154,18 +160,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            userDao.createUser(Database.getFirebaseUser());
-                            updateUI();
-                        } else {
-                            loadingDialog.dismissLoadingDialog();
-                            Toast.makeText(LoginActivity.this, getString(R.string.fall_login), Toast.LENGTH_SHORT).show();
-                        }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        User user = new User();
+                        user.toUser(task.getResult().getUser());
 
+                        userDao.createUser(user);
+                        updateUI(user);
+                    } else {
+                        loadingDialog.dismissLoadingDialog();
+                        Toast.makeText(LoginActivity.this, getString(R.string.fall_login), Toast.LENGTH_SHORT).show();
                     }
+
                 });
     }
 
@@ -176,7 +182,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            updateUI();
+                            User user = new User();
+                            user.toUser(task.getResult().getUser());
+                            updateUI(user);
                         } else {
                             Toast.makeText(LoginActivity.this, getString(R.string.fall_login), Toast.LENGTH_SHORT).show();
 
@@ -188,6 +196,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onBackPressed() {
         finish();
-        System.exit(0);
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            System.exit(0);
+        }
     }
 }

@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,13 +33,16 @@ public class TodoDao {
     private Activity activity;
     private DataChangeListener listener;
     private RemindTodoListener reminderListener;
-    private CollectionReference reference = Database.getDb().collection(Todo.TODO_COLL)
-            .document(Database.getFirebaseUser().getUid()).collection(Todo.TODO_COLL_MY_TODO);
+    private CollectionReference reference;
+    private FirebaseUser firebaseUser;
 
     public TodoDao() {
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        reference = Database.getDb().collection(Todo.TODO_COLL)
+                .document(firebaseUser.getUid()).collection(Todo.TODO_COLL_MY_TODO);
     }
 
-    public TodoDao(Activity activity) {
+    public void setActivity(Activity activity) {
         this.activity = activity;
     }
 
@@ -54,6 +59,7 @@ public class TodoDao {
     }
 
     public void getTodos(Date startDate, Date endDate, int status) {
+
         Query querySnapshotTask = reference.whereEqualTo("status", status);
 
         if (startDate != null) {
@@ -67,7 +73,7 @@ public class TodoDao {
         querySnapshotTask
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> listener.getTodoSuccess(status, queryDocumentSnapshots))
+                .addOnSuccessListener(task -> listener.getTodoSuccess(status, task))
                 .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
@@ -186,8 +192,6 @@ public class TodoDao {
     public void updateTodo(Todo todo) {
         reference.document(todo.getId() + "")
                 .set(todo)
-                .addOnSuccessListener(aVoid -> {
-                })
                 .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
@@ -197,25 +201,17 @@ public class TodoDao {
 
         reference.document(todo.getId() + "")
                 .delete()
-                .addOnSuccessListener(aVoid -> listener.deleteTodoSuccess(originalTodo))
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                .addOnSuccessListener(task -> listener.deleteTodoSuccess(originalTodo))
+                .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     public void realtimeUpdate() {
-        reference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                listener.realtimeUpdateSuccess();
+        reference.addSnapshotListener((snapshots, error) -> {
+            if (error != null) {
+                Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
             }
+            listener.realtimeUpdateSuccess();
         });
     }
 
@@ -238,30 +234,27 @@ public class TodoDao {
     }
 
     public void updateRemindTodo() {
-        reference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    return;
+        reference.addSnapshotListener((snapshots, error) -> {
+            if (error != null) {
+                Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                switch (dc.getType()) {
+                    case ADDED:
+                        Log.d("Demo", dc.getDocument().toString());
+                        break;
+                    case MODIFIED:
+                        Log.d("Demo2", dc.getDocument().toString());
+                        break;
+                    case REMOVED:
+                        Log.d("Demo3", dc.getDocument().toString());
+                        break;
+                    default:
+                        break;
                 }
 
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        case ADDED:
-                            Log.d("Demo", dc.getDocument().toString());
-                            break;
-                        case MODIFIED:
-                            Log.d("Demo2", dc.getDocument().toString());
-                            break;
-                        case REMOVED:
-                            Log.d("Demo3", dc.getDocument().toString());
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
             }
         });
     }

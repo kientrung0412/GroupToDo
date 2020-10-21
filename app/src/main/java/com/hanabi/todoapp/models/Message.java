@@ -5,6 +5,8 @@ import android.provider.Settings;
 import java.util.Date;
 
 public class Message {
+    public static final String NAME_COLL = "message";
+    public static final String NAME_COLL_CHILDREN = "messages";
 
     private String messageId = String.valueOf(System.currentTimeMillis());
     private String messageContent;

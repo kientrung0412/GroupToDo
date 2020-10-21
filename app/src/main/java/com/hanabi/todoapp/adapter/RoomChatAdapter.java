@@ -89,13 +89,13 @@ public class RoomChatAdapter extends RecyclerView.Adapter<RoomChatAdapter.Holder
         }
 
         private void bindView(RoomChat roomChat) {
-            Message lastMessage = roomChat.getMessages().get(roomChat.getMessages().size() - 1);
-            DateFormat dateFormat = new SimpleDateFormat("dd/MM HH:mm");
-            Date date = lastMessage.getCreatedAt();
-            String dateStr = dateFormat.format(date);
-
-            tvLastContent.setText(lastMessage.getContent());
-            tvTimeChat.setText(dateStr);
+//            Message lastMessage = roomChat.getMessages().get(roomChat.getMessages().size() - 1);
+//            DateFormat dateFormat = new SimpleDateFormat("dd/MM HH:mm");
+//            Date date = lastMessage.getCreatedAt();
+//            String dateStr = dateFormat.format(date);
+//
+//            tvLastContent.setText(lastMessage.getContent());
+//            tvTimeChat.setText(dateStr);
         }
     }
 

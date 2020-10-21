@@ -7,12 +7,12 @@ public class RoomChat {
 
     public static final String NAME_COLL = "room";
 
-    private String roomId;
+    private String roomId = String.valueOf(System.currentTimeMillis());
     private String roomName;
     private String createdBy;
-    private Date createdAt;
     private List<String> usersId;
     private String roomImageUrl;
+    private boolean isGroup = false;
 
     public RoomChat() {
     }
@@ -45,14 +45,6 @@ public class RoomChat {
         this.createdBy = createdBy;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public List<String> getUsersId() {
         return usersId;
     }
@@ -67,5 +59,13 @@ public class RoomChat {
 
     public void setRoomImageUrl(String roomImageUrl) {
         this.roomImageUrl = roomImageUrl;
+    }
+
+    public boolean isGroup() {
+        return isGroup;
+    }
+
+    public void setGroup(boolean group) {
+        isGroup = group;
     }
 }

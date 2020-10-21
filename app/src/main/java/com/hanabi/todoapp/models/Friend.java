@@ -11,7 +11,7 @@ public class Friend {
     public static final int FRIEND_STATUS_Y = 1;
     public static final int FRIEND_STATUS_Q = 0;
 
-    private String friendId = String.valueOf(System.currentTimeMillis());
+    private String friendId = System.currentTimeMillis() + Database.getFirebaseUser().getUid();
     private List<String> userIds;
     private int status;
     private String createdBy = Database.getFirebaseUser().getUid();

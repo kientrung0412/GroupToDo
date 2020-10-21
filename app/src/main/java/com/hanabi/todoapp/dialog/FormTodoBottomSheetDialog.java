@@ -65,7 +65,8 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
         ivAdd = view.findViewById(R.id.iv_add_my_todo);
 
         manageDate = new ManageDate();
-        todoDao = new TodoDao(getActivity());
+        todoDao = new TodoDao();
+        todoDao.setActivity(getActivity());
         now = calendar.getTime();
 
         imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);

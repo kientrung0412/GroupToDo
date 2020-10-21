@@ -58,7 +58,7 @@ public class ToDoFragment extends Fragment
     private Calendar calendar = Calendar.getInstance();
     private Date now = calendar.getTime();
 
-    private TodoDao todoDao = new TodoDao(getActivity());
+    private TodoDao todoDao = new TodoDao();
 
     public FloatingActionButton getFabAdd() {
         return fabAdd;
@@ -78,6 +78,7 @@ public class ToDoFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+        todoDao.setActivity(getActivity());
         tvCountDone = getActivity().findViewById(R.id.tv_count_done);
         rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new);
         rcvTodoDone = getActivity().findViewById(R.id.rcv_my_todo_done);
@@ -125,7 +126,7 @@ public class ToDoFragment extends Fragment
 
     @Override
     public void onClickMyTodo(Todo todo) {
-        Intent intent = new Intent(getActivity(), DetailActivity.class);
+        Intent intent = new Intent(getActivity(), DetailTodoActivity.class);
         intent.putExtra(MainActivity.EXTRA_DETAIL_TODO, todo);
         startActivity(intent);
     }

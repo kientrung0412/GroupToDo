@@ -30,7 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-public class DetailActivity extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+public class DetailTodoActivity extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     public static final int TAG_EMPTY = 1;
     public static final int TAG_NOT_EMPTY = 2;
@@ -56,7 +56,7 @@ public class DetailActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_detail_todo);
         initViews();
         bindViews();
     }

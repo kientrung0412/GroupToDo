@@ -16,6 +16,7 @@ import androidx.work.WorkManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initViews() {
+        Intent intent = getIntent();
+        User user = (User) intent.getSerializableExtra(LoginActivity.EXTRA_USER);
         setTitle(toDoFragment.getTitleToolBar());
         toolbar = findViewById(R.id.tb_main);
         drawerLayout = findViewById(R.id.dl_main);
@@ -97,9 +100,9 @@ public class MainActivity extends AppCompatActivity
         tvName = lnNavHeader.findViewById(R.id.tv_name);
         civAvatar = lnNavHeader.findViewById(R.id.civ_avatar);
 
-        tvEmail.setText(Database.getFirebaseUser().getEmail());
-        tvName.setText(Database.getFirebaseUser().getDisplayName());
-        Glide.with(civAvatar).load(Database.getFirebaseUser().getPhotoUrl()).into(civAvatar);
+        tvEmail.setText(user.getEmail());
+        tvName.setText(user.getDisplayName());
+        Glide.with(civAvatar).load(user.getPhotoUrl()).into(civAvatar);
 
         navigationViewl.setNavigationItemSelectedListener(this);
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_baseline_more_vert_24, null));
@@ -164,6 +167,26 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_directory, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.it_add_friend:
+                intent = new Intent(this, AddFriendActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.it_notification:
+                intent = new Intent(this, AddFriendActivity.class);
+                break;
+        }
+        return true;
+    }
 
     @Override
     public void onClick(View view) {
