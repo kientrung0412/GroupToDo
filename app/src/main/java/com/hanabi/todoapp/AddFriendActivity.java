@@ -26,10 +26,10 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AddFriendActivity extends AppCompatActivity implements View.OnClickListener {
+public class AddFriendActivity extends AppCompatActivity implements View.OnClickListener, UserDao.GetDataQuery {
 
     private MaterialToolbar toolbar;
-    private MaterialButton btnSearch, btnSendInvitation, btnRemoveInvitation, btnSendMessage;
+    private MaterialButton btnSearch, btnSendInvitation, btnRemoveInvitation, btnSendMessage, btnAcceptInvitation;
     private EditText edtEmail;
     private CircleImageView civAvatar;
     private TextView tvName;
@@ -39,7 +39,6 @@ public class AddFriendActivity extends AppCompatActivity implements View.OnClick
     private UserDao userDao;
     private FriendDao friendDao;
     private Friend friend;
-    private User user;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,39 +50,7 @@ public class AddFriendActivity extends AppCompatActivity implements View.OnClick
 
     private void bindViews() {
         userDao.searchFriendByEmail(edtEmail.getText().toString().trim());
-        userDao.setDataQuery(user -> {
-            if (user != null) {
-                llProfileSearch.setVisibility(View.VISIBLE);
-                tvName.setText(user.getDisplayName());
-                Glide.with(civAvatar).load(user.getPhotoUrl()).into(civAvatar);
-
-                // kiem tra ban be
-                friendDao.isFriend(Arrays.asList(Database.getFirebaseUser().getUid(), user.getUid()));
-                friendDao.setGetData(snapshot -> {
-                    //chua gui loi moi
-                    if (snapshot.isEmpty()) {
-                        this.friend = null;
-                        btnSendMessage.setVisibility(View.GONE);
-                        btnRemoveInvitation.setVisibility(View.GONE);
-                        btnSendInvitation.setVisibility(View.VISIBLE);
-                        return;
-                    }
-                    this.friend = new Friend();
-                    Friend friend = snapshot.getDocuments().get(0).toObject(Friend.class);
-                    this.friend = friend;
-                    //da gui nhun chua dong y
-                    if (friend.getStatus() == Friend.FRIEND_STATUS_Q) {
-                        btnSendMessage.setVisibility(View.GONE);
-                    } else {
-                        //da la ban be
-                        btnSendMessage.setVisibility(View.VISIBLE);
-                    }
-                    btnRemoveInvitation.setVisibility(View.VISIBLE);
-                    btnSendInvitation.setVisibility(View.GONE);
-                });
-            }
-        });
-
+        userDao.setDataQuery(this);
     }
 
     private void initViews() {
@@ -94,6 +61,7 @@ public class AddFriendActivity extends AppCompatActivity implements View.OnClick
         btnSendInvitation = findViewById(R.id.btn_send_invitation);
         btnRemoveInvitation = findViewById(R.id.btn_remove_invitation);
         btnSendMessage = findViewById(R.id.btn_send_message);
+        btnAcceptInvitation = findViewById(R.id.btn_accept_invitation);
         edtEmail = findViewById(R.id.edt_email);
         civAvatar = findViewById(R.id.civ_avatar);
         tvName = findViewById(R.id.tv_name);
@@ -107,6 +75,7 @@ public class AddFriendActivity extends AppCompatActivity implements View.OnClick
         btnSendInvitation.setOnClickListener(this);
         btnRemoveInvitation.setOnClickListener(this);
         btnSendMessage.setOnClickListener(this);
+        btnAcceptInvitation.setOnClickListener(this);
 
     }
 
@@ -115,7 +84,6 @@ public class AddFriendActivity extends AppCompatActivity implements View.OnClick
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_search:
-                friend = null;
                 edtEmail.clearFocus();
                 bindViews();
                 break;
@@ -124,6 +92,9 @@ public class AddFriendActivity extends AppCompatActivity implements View.OnClick
                 bindViews();
                 break;
             case R.id.btn_send_message:
+                break;
+            case R.id.btn_accept_invitation:
+                friendDao.acceptFriendInvitation(friend);
                 bindViews();
                 break;
             case R.id.btn_send_invitation:
@@ -134,5 +105,58 @@ public class AddFriendActivity extends AppCompatActivity implements View.OnClick
                 finish();
                 break;
         }
+    }
+
+    @Override
+    public void getFriend(User user) {
+        if (user != null) {
+            llProfileSearch.setVisibility(View.VISIBLE);
+            tvName.setText(user.getDisplayName());
+            Glide.with(civAvatar).load(user.getPhotoUrl()).into(civAvatar);
+
+            // kiem tra ban be
+            friendDao.isFriend(Arrays.asList(Database.getFirebaseUser().getUid(), user.getUid()));
+            friendDao.setGetData(friends -> {//chua gui loi moi
+                if (friends.isEmpty()) {
+                    friend = new Friend();
+                    friend.setUserIds(Arrays.asList(Database.getFirebaseUser().getUid(), user.getUid()));
+
+                    btnSendMessage.setVisibility(View.GONE);
+                    btnRemoveInvitation.setVisibility(View.GONE);
+                    btnSendInvitation.setVisibility(View.VISIBLE);
+                    return;
+                }
+                this.friend = friends.get(0);
+                //kem tra xe co tu gui khong
+                //da gui nhung chua dong y
+                if (friend.getCreatedBy().equals(Database.getFirebaseUser().getUid())) {
+                    if (friend.getStatus() == Friend.FRIEND_STATUS_Q) {
+                        btnSendMessage.setVisibility(View.GONE);
+                    } else {
+                        //da la ban be
+                        btnSendMessage.setVisibility(View.VISIBLE);
+                    }
+                    btnRemoveInvitation.setVisibility(View.VISIBLE);
+                    btnSendInvitation.setVisibility(View.GONE);
+                    btnAcceptInvitation.setVisibility(View.GONE);
+                } else {
+                    if (friend.getStatus() == Friend.FRIEND_STATUS_Q) {
+                        btnSendMessage.setVisibility(View.GONE);
+                        btnAcceptInvitation.setVisibility(View.VISIBLE);
+
+                    } else {
+                        //da la ban be
+                        btnAcceptInvitation.setVisibility(View.GONE);
+                        btnSendMessage.setVisibility(View.VISIBLE);
+                        btnRemoveInvitation.setText("Hủy kết bạn");
+                    }
+                    btnRemoveInvitation.setVisibility(View.VISIBLE);
+                    btnSendInvitation.setVisibility(View.GONE);
+                }
+            });
+            return;
+        }
+        llProfileSearch.setVisibility(View.GONE);
+        Toast.makeText(this, "Không tìm thấy kết quả phù hợp,xin kiểm tra lại", Toast.LENGTH_SHORT).show();
     }
 }

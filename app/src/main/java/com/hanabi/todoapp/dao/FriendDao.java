@@ -11,11 +11,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.models.Friend;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +56,7 @@ public class FriendDao {
         reference
                 .whereArrayContains("userIds", Arrays.asList(Database.getFirebaseUser().getUid()))
                 .get()
-                .addOnSuccessListener(snapshost -> getData.getFriends(snapshost))
+//                .addOnSuccessListener(snapshost -> getData.getFriends(snapshost))
                 .addOnFailureListener(e -> {
                     if (activity != null) {
                         Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -96,9 +98,22 @@ public class FriendDao {
 
     public void isFriend(List<String> userIds) {
         reference
-                .whereArrayContainsAny("userIds", userIds)
+                .whereArrayContainsAny("userIds", Arrays.asList(userIds.get(0)))
                 .get()
-                .addOnSuccessListener(snapshost -> getData.getFriends(snapshost))
+                .addOnSuccessListener(snapshost -> {
+                    ArrayList<Friend> friends = new ArrayList<>();
+                    for (DocumentSnapshot item : snapshost.getDocuments()) {
+                        Friend friend = item.toObject(Friend.class);
+                        if (friend.getUserIds().get(0).equals(friend.getUserIds().get(1))) {
+                            getData.getFriends(friends);
+                            return;
+                        }
+                        if (friend.getUserIds().contains(userIds.get(1))) {
+                            friends.add(friend);
+                        }
+                    }
+                    getData.getFriends(friends);
+                })
                 .addOnFailureListener(e -> {
                     if (activity != null) {
                         Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -108,7 +123,7 @@ public class FriendDao {
 
 
     public interface GetData {
-        void getFriends(QuerySnapshot snapshot);
+        void getFriends(ArrayList<Friend> friends);
     }
 
     public interface OnListener {

@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.hanabi.todoapp.dao.Database;
 import com.hanabi.todoapp.dao.FriendDao;
 import com.hanabi.todoapp.dao.UserDao;
@@ -36,6 +37,7 @@ import com.hanabi.todoapp.sevice.RemindService;
 import com.hanabi.todoapp.works.LoopWork;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -67,7 +69,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         initViews();
         setupWork();
-
 //        setupService();
     }
 
