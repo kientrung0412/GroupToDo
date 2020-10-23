@@ -16,6 +16,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.models.Friend;
+import com.hanabi.todoapp.models.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,11 +53,29 @@ public class FriendDao {
         updateFriend(friend);
     }
 
-    public void getListOfFriend() {
+    public void getFriendList() {
         reference
-                .whereArrayContains("userIds", Arrays.asList(Database.getFirebaseUser().getUid()))
+                .whereArrayContainsAny("userIds", Arrays.asList(Database.getFirebaseUser().getUid()))
+                .whereEqualTo("status", Friend.FRIEND_STATUS_Y)
                 .get()
-//                .addOnSuccessListener(snapshost -> getData.getFriends(snapshost))
+                .addOnSuccessListener(querySnapshot -> {
+                    ArrayList<User> users = new ArrayList<>(); v
+                    if (querySnapshot.isEmpty()) {
+                        return;
+                    }
+                    for (DocumentSnapshot snapshot : querySnapshot.getDocuments()) {
+                        Friend friend = snapshot.toObject(Friend.class);
+                        String friendId;
+                        if (friend.getUserIds().get(0).equals(Database.getFirebaseUser().getUid())) {
+                            friendId = friend.getUserIds().get(1);
+                        } else {
+                            friendId = friend.getUserIds().get(0);
+                        }
+                        UserDao userDao = new UserDao();
+
+                    }
+
+                })
                 .addOnFailureListener(e -> {
                     if (activity != null) {
                         Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();

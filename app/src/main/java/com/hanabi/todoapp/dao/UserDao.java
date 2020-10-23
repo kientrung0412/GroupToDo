@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.models.Todo;
@@ -27,6 +28,9 @@ public class UserDao {
                 .set(firebaseUser);
     }
 
+    public User getUser(String id) {
+        return reference.document(id).get().getResult().toObject(User.class);
+    }
 
     public void searchFriendByEmail(String email) {
         reference
