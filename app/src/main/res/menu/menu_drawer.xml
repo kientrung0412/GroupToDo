@@ -5,13 +5,18 @@
     tools:showIn="navigation_view">
 
     <item
-        android:id="@+id/it_my_todo"
+        android:id="@+id/it_today_todo"
         android:icon="@drawable/ic_work"
-        android:title="@string/my_todo" />
+        android:title="@string/today" />
 
     <item
-        android:id="@+id/it_chat"
+        android:id="@+id/it_bookmark_todo"
         android:icon="@drawable/ic_chat"
-        android:title="@string/message" />
+        android:title="@string/bookmark" />
+
+    <item
+        android:id="@+id/it_list_todo"
+        android:icon="@drawable/ic_chat"
+        android:title="@string/list_todo" />
 
 </menu>

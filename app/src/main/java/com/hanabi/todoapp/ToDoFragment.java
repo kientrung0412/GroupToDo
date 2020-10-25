@@ -107,13 +107,13 @@ public class ToDoFragment extends Fragment
         swipeRecyclerView(rcvTodoNew, adapterNew);
         swipeRecyclerView(rcvTodoDone, adapterDone);
 
+        loadingData();
         todoDao.setListener(this);
 
-        loadingData();
         realtimeUpdate();
     }
 
-    private void realtimeUpdate() {
+    private void  realtimeUpdate() {
         todoDao.realtimeUpdate();
     }
 

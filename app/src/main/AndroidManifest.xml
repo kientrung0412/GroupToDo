@@ -11,10 +11,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AddFriendActivity">
-
-        </activity>
-        <activity android:name=".CreateRoomActivity" />
         <activity android:name=".DetailTodoActivity" />
         <activity android:name=".ProflieActivity" />
         <activity android:name=".LoginActivity">

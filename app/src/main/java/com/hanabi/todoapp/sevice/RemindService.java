@@ -8,10 +8,6 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.hanabi.todoapp.dao.TodoDao;
-import com.hanabi.todoapp.models.Todo;
-import com.hanabi.todoapp.utils.MessageNotification;
-
-import java.util.ArrayList;
 
 public class RemindService extends Service {
     public static final String TAG = RemindService.class.getName();

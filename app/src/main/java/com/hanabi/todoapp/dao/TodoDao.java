@@ -243,13 +243,13 @@ public class TodoDao {
             for (DocumentChange dc : snapshots.getDocumentChanges()) {
                 switch (dc.getType()) {
                     case ADDED:
-                        Log.d("Demo", dc.getDocument().toString());
+
                         break;
                     case MODIFIED:
-                        Log.d("Demo2", dc.getDocument().toString());
+
                         break;
                     case REMOVED:
-                        Log.d("Demo3", dc.getDocument().toString());
+
                         break;
                     default:
                         break;

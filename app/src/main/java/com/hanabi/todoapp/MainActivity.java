@@ -16,29 +16,19 @@ import androidx.work.WorkManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.hanabi.todoapp.dao.Database;
-import com.hanabi.todoapp.dao.FriendDao;
-import com.hanabi.todoapp.dao.UserDao;
-import com.hanabi.todoapp.models.Friend;
 import com.hanabi.todoapp.models.User;
 import com.hanabi.todoapp.sevice.RemindService;
 import com.hanabi.todoapp.works.LoopWork;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -60,7 +50,6 @@ public class MainActivity extends AppCompatActivity
     private CircleImageView civAvatar;
 
     private ToDoFragment toDoFragment = new ToDoFragment();
-    private ChatFragment chatFragment = new ChatFragment();
 
 
     @Override
@@ -117,14 +106,12 @@ public class MainActivity extends AppCompatActivity
 
     private void initFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.fl_main, chatFragment);
         transaction.add(R.id.fl_main, toDoFragment);
         transaction.commit();
     }
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.hide(chatFragment);
         transaction.hide(toDoFragment);
         transaction.show(fragment);
         transaction.commit();
@@ -155,39 +142,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.it_my_todo:
+            case R.id.it_today_todo:
                 showFragment(toDoFragment);
                 setTitle(toDoFragment.getTitleToolBar());
-                break;
-            case R.id.it_chat:
-                showFragment(chatFragment);
-                setTitle(chatFragment.getTitle());
                 break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_directory, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Intent intent;
-        switch (item.getItemId()) {
-            case R.id.it_add_friend:
-                intent = new Intent(this, AddFriendActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.it_notification:
-                intent = new Intent(this, AddFriendActivity.class);
-                break;
-        }
-        return true;
-    }
 
     @Override
     public void onClick(View view) {

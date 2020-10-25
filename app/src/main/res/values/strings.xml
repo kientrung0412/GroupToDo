@@ -22,4 +22,7 @@
     <string name="menu_todo_done">Hoàn thành</string>
     <string name="menu_todo_new">Mới</string>
     <string name="menu_todo_fall">Thất bại</string>
+    <string name="today">Hôm nay</string>
+    <string name="bookmark">Danh sách quan trọng</string>
+    <string name="list_todo">Danh sách tác vụ</string>
 </resources>
