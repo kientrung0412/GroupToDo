@@ -35,6 +35,7 @@ public class TodoDao {
     private RemindTodoListener reminderListener;
     private CollectionReference reference;
     private FirebaseUser firebaseUser;
+    private OnRealTimeUpdate realTimeUpdate;
 
     public TodoDao() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -56,6 +57,10 @@ public class TodoDao {
 
     public void setReminderListener(RemindTodoListener reminderListener) {
         this.reminderListener = reminderListener;
+    }
+
+    public void setRealTimeUpdate(OnRealTimeUpdate realTimeUpdate) {
+        this.realTimeUpdate = realTimeUpdate;
     }
 
     public void getTodos(Date startDate, Date endDate, int status) {
@@ -205,7 +210,7 @@ public class TodoDao {
                 .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    public void realtimeUpdate() {
+    public void realtimeUpdateTodos() {
         reference.addSnapshotListener((snapshots, error) -> {
             if (error != null) {
                 Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
@@ -214,6 +219,20 @@ public class TodoDao {
             listener.realtimeUpdateSuccess();
         });
     }
+
+    public void realtimeUpdateTodo(String todoId) {
+        reference.document(todoId)
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (realTimeUpdate != null) {
+                        realTimeUpdate.todoUpdate(snapshots.toObject(Todo.class));
+                    }
+                });
+    }
+
 
     public void remindTodo() {
         reference
@@ -275,5 +294,9 @@ public class TodoDao {
 
     public interface RemindTodoListener {
         void getTodoSuccess(ArrayList<Todo> todos);
+    }
+
+    public interface OnRealTimeUpdate {
+        void todoUpdate(Todo todo);
     }
 }

@@ -60,10 +60,6 @@ public class ToDoFragment extends Fragment
 
     private TodoDao todoDao = new TodoDao();
 
-    public FloatingActionButton getFabAdd() {
-        return fabAdd;
-    }
-
     public String getTitleToolBar() {
         return titleToolBar;
     }
@@ -114,7 +110,7 @@ public class ToDoFragment extends Fragment
     }
 
     private void  realtimeUpdate() {
-        todoDao.realtimeUpdate();
+        todoDao.realtimeUpdateTodos();
     }
 
     private void loadingData() {

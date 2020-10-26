@@ -87,6 +87,15 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
         cbStatus.setOnClickListener(this);
         toolbar.setNavigationOnClickListener(this);
 
+        realtimeUpdate();
+    }
+
+    private void realtimeUpdate() {
+        todoDao.realtimeUpdateTodo(todo.getId() + "");
+        todoDao.setRealTimeUpdate(todo -> {
+            this.todo = todo;
+            bindViews();
+        });
     }
 
     private void bindViews() {

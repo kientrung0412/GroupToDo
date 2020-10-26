@@ -13,7 +13,6 @@ public class RemindService extends Service {
     public static final String TAG = RemindService.class.getName();
 
     private TodoDao todoDao;
-    private MessageNotification notification;
 
     @Nullable
     @Override
