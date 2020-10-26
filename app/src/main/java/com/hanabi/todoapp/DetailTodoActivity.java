@@ -189,7 +189,9 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
     private void setProperty(TextView textView, String content) {
         textView.setTag(TAG_NOT_EMPTY);
         textView.setText(content);
-        textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close, 0);
+        if (textView.getId() != R.id.tv_set_time){
+            textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close, 0);
+        }
         textView.setTextColor(getResources().getColor(R.color.colorPrimary, null));
     }
 
@@ -212,8 +214,9 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
             case R.id.ll_loop:
                 if (Integer.parseInt(String.valueOf(tvLoop.getTag())) == TAG_NOT_EMPTY) {
                     todo.setLoop(false);
+                    todo.setLoopTodoMap(null);
                     todoDao.updateTodo(todo);
-                    resetProperty(tvLoop, "Lặp lai");
+                    resetProperty(tvLoop, "Lặp lại");
                     return;
                 }
                 popupMenu = new PopupMenu(this, view);

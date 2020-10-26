@@ -52,7 +52,7 @@
                     android:layout_marginHorizontal="4dp"
                     android:layout_weight="1"
                     android:background="@color/colorWhite"
-                    android:inputType="textLongMessage"
+                    android:inputType="textImeMultiLine"
                     android:paddingVertical="8dp"
                     android:text=" ágdhj g sa dsa da da d a ád "
                     android:textColor="@color/colorBlack"
