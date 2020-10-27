@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.R;
 
@@ -57,25 +58,19 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         holder.bindView(todo);
 
         if (listener != null) {
-            holder.cbDone.setOnClickListener(new View.OnClickListener() {
+            holder.lavStar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onChangeCheckbox(todo);
+                    listener.onCheckBookmark(todo);
                 }
             });
+            holder.cbDone.setOnClickListener(view -> listener.onChangeCheckbox(todo));
 
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onClickMyTodo(todo);
-                }
-            });
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    listener.onClickLongMyTodo(todo);
-                    return true;
-                }
+            holder.itemView.setOnClickListener(view -> listener.onClickMyTodo(todo));
+
+            holder.itemView.setOnLongClickListener(view -> {
+                listener.onClickLongMyTodo(todo);
+                return true;
             });
         }
     }
@@ -90,11 +85,14 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         private TextView tvContent, tvTime;
         private CheckBox cbDone;
         private ImageView ivLoop;
+        private LottieAnimationView lavStar;
+        private Boolean isCheckBookmark = false;
 
         public HolderMyTodo(@NonNull View itemView) {
             super(itemView);
             tvContent = itemView.findViewById(R.id.edt_content_todo);
             ivLoop = itemView.findViewById(R.id.iv_loop);
+            lavStar = itemView.findViewById(R.id.lav_star);
 //            tvTime = itemView.findViewById(R.id.tv_todo_create_at);
             cbDone = itemView.findViewById(R.id.cb_done);
         }
@@ -132,6 +130,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
         void onChangeCheckbox(Todo todo);
 
+        void onCheckBookmark(Todo todo);
     }
 
 }

@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.hanabi.todoapp.dao.TodoDao;
 import com.hanabi.todoapp.dialog.RemindPickDateDialog;
@@ -35,6 +36,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
     public static final int TAG_EMPTY = 1;
     public static final int TAG_NOT_EMPTY = 2;
 
+    private LottieAnimationView lavStar;
     private EditText edtContentChildren, edtContent;
     private LinearLayout llAddChildren, llSetTime, llLoop, llRemind;
     private TextView tvSetTime, tvLoop, tvRemind;
@@ -47,6 +49,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
 
     private TodoDao todoDao = new TodoDao();
 
+    private Boolean checkStar = false;
     private Calendar calendar = Calendar.getInstance();
     private ManageDate manageDate = new ManageDate();
     private Date now = calendar.getTime();
@@ -65,6 +68,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
         Intent intent = getIntent();
         todo = (Todo) intent.getSerializableExtra(MainActivity.EXTRA_DETAIL_TODO);
 
+        lavStar = findViewById(R.id.lav_star);
         edtContent = findViewById(R.id.edt_content_children);
         llAddChildren = findViewById(R.id.ll_add_children_todo);
         llSetTime = findViewById(R.id.ll_set_time);
@@ -85,6 +89,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
         llRemind.setOnClickListener(this);
         llSetTime.setOnClickListener(this);
         cbStatus.setOnClickListener(this);
+        lavStar.setOnClickListener(this);
         toolbar.setNavigationOnClickListener(this);
 
         realtimeUpdate();
@@ -207,6 +212,17 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
         switch (view.getId()) {
             case -1:
                 finish();
+                break;
+            case R.id.lav_star:
+                if (checkStar) {
+                    lavStar.setSpeed(-1.5f);
+                    lavStar.playAnimation();
+                    checkStar = false;
+                } else {
+                    lavStar.setSpeed(1.5f);
+                    lavStar.playAnimation();
+                    checkStar = true;
+                }
                 break;
             case R.id.ll_add_children_todo:
                 edtContent.setFocusable(true);
