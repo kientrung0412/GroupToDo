@@ -189,7 +189,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
     private void setProperty(TextView textView, String content) {
         textView.setTag(TAG_NOT_EMPTY);
         textView.setText(content);
-        if (textView.getId() != R.id.tv_set_time){
+        if (textView.getId() != R.id.tv_set_time) {
             textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close, 0);
         }
         textView.setTextColor(getResources().getColor(R.color.colorPrimary, null));
@@ -214,7 +214,8 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
             case R.id.ll_loop:
                 if (Integer.parseInt(String.valueOf(tvLoop.getTag())) == TAG_NOT_EMPTY) {
                     todo.setLoop(false);
-                    todo.setLoopTodoMap(null);
+                    loopTodo.reset();
+                    todo.setLoopTodoMap(loopTodo.toMap());
                     todoDao.updateTodo(todo);
                     resetProperty(tvLoop, "Lặp lại");
                     return;
@@ -279,6 +280,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.it_loop_day:
                 loopTodo.setDays(1);
+                todo.setLoopTodoMap(loopTodo.toMap());
                 todo.setLoop(true);
                 break;
             case R.id.it_loop_week:
@@ -329,6 +331,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
                 try {
                     Date date = dateFormat.parse(dayOfMonthSelect + "/" + (monthOfYearSelect + 1) + "/" + yearSelect);
                     todo.setCreatedAt(date);
+                    todoDao.updateTodo(todo);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

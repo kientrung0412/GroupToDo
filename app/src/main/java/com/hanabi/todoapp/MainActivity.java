@@ -20,13 +20,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.hanabi.todoapp.models.User;
-import com.hanabi.todoapp.sevice.RemindService;
+import com.hanabi.todoapp.service.RemindService;
 import com.hanabi.todoapp.works.LoopWork;
 
 import java.util.concurrent.TimeUnit;
@@ -35,7 +41,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, OnSuccessListener<Void>, OnFailureListener {
 
     public static final int REQUEST_CODE_OFF = 1;
 
@@ -50,7 +56,7 @@ public class MainActivity extends AppCompatActivity
     private CircleImageView civAvatar;
 
     private ToDoFragment toDoFragment = new ToDoFragment();
-
+    private FirebaseMessaging fcm = FirebaseMessaging.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +64,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         initViews();
         setupWork();
-//        setupService();
+        setupService();
     }
 
     private void setupService() {
-        Intent intent = new Intent(this, RemindService.class);
-        startService(intent);
+//        Intent intent = new Intent(this, RemindService.class);
+//        startService(intent);
+        fcm.subscribeToTopic("demo").addOnSuccessListener(this).addOnFailureListener(this);
     }
 
 
@@ -170,5 +177,15 @@ public class MainActivity extends AppCompatActivity
                 data.getExtras();
             }
         }
+    }
+
+    @Override
+    public void onSuccess(Void aVoid) {
+        Toast.makeText(this, "done", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFailure(@NonNull Exception e) {
+        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 }

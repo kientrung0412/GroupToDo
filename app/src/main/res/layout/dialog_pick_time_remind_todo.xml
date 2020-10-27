@@ -15,7 +15,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="16dp"
-            android:text="Ngày" />
+            android:text="Ngày"
+            android:textColor="@color/colorPrimary" />
 
         <TextView
             android:id="@+id/tv_time"
@@ -24,7 +25,8 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="16dp"
-            android:text="Giờ" />
+            android:text="Giờ"
+            android:textColor="@color/colorGray" />
 
     </LinearLayout>
 
@@ -44,7 +46,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
+        android:paddingRight="16dp"
         android:layout_marginBottom="16dp">
 
         <TextView
