@@ -61,6 +61,16 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
             holder.lavStar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if (holder.isCheckBookmark){
+                            holder.lavStar.setSpeed(-1.5f);
+                            holder.lavStar.playAnimation();
+                            holder.isCheckBookmark = false;
+
+                    } else {
+                        holder.lavStar.setSpeed(1.5f);
+                        holder.lavStar.playAnimation();
+                        holder.isCheckBookmark = true;
+                    }
                     listener.onCheckBookmark(todo);
                 }
             });

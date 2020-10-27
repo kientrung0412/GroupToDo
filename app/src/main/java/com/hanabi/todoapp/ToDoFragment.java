@@ -170,6 +170,11 @@ public class ToDoFragment extends Fragment
     }
 
     @Override
+    public void onCheckBookmark(Todo todo) {
+
+    }
+
+    @Override
     public void onRefresh() {
         loadingData();
         srlReload.setRefreshing(false);
