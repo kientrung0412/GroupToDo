@@ -12,9 +12,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.R;
+import com.hanabi.todoapp.views.CustomCheckbox;
 
 import java.util.ArrayList;
 
@@ -58,26 +58,10 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         holder.bindView(todo);
 
         if (listener != null) {
-            holder.lavStar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (holder.isCheckBookmark){
-                            holder.lavStar.setSpeed(-1.5f);
-                            holder.lavStar.playAnimation();
-                            holder.isCheckBookmark = false;
-
-                    } else {
-                        holder.lavStar.setSpeed(1.5f);
-                        holder.lavStar.playAnimation();
-                        holder.isCheckBookmark = true;
-                    }
-                    listener.onCheckBookmark(todo);
-                }
-            });
+            holder.ccbStar.setOnClickListener(view -> listener.onCheckBookmark(todo));
             holder.cbDone.setOnClickListener(view -> listener.onChangeCheckbox(todo));
 
             holder.itemView.setOnClickListener(view -> listener.onClickMyTodo(todo));
-
             holder.itemView.setOnLongClickListener(view -> {
                 listener.onClickLongMyTodo(todo);
                 return true;
@@ -95,26 +79,26 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         private TextView tvContent, tvTime;
         private CheckBox cbDone;
         private ImageView ivLoop;
-        private LottieAnimationView lavStar;
-        private Boolean isCheckBookmark = false;
+        private CustomCheckbox ccbStar;
 
         public HolderMyTodo(@NonNull View itemView) {
             super(itemView);
             tvContent = itemView.findViewById(R.id.edt_content_todo);
             ivLoop = itemView.findViewById(R.id.iv_loop);
-            lavStar = itemView.findViewById(R.id.lav_star);
+            ccbStar = itemView.findViewById(R.id.ccb_bookmark);
 //            tvTime = itemView.findViewById(R.id.tv_todo_create_at);
             cbDone = itemView.findViewById(R.id.cb_done);
         }
 
         private void bindView(Todo todo) {
             tvContent.setText(todo.getContent());
-
             if (todo.getLoop()) {
                 ivLoop.setVisibility(View.VISIBLE);
             } else {
                 ivLoop.setVisibility(View.GONE);
             }
+
+            ccbStar.setCheck(todo.getBookmark());
 
             switch (todo.getStatus()) {
                 case Todo.TODO_STATUS_NEW:

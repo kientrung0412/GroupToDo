@@ -1,6 +1,7 @@
 package com.hanabi.todoapp.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,8 @@ public class Todo implements Serializable {
     private Boolean isLoop = false;
     private Date remindDate = null;
     private Date completedDate = null;
+    private Boolean bookmark = false;
+    private ArrayList<Map<String, Object>> childrenTodo = null;
     private Map<String, Object> loopTodoMap = new HashMap<>();
 
     public long getId() {
@@ -84,6 +87,22 @@ public class Todo implements Serializable {
 
     public void setLoop(Boolean loop) {
         isLoop = loop;
+    }
+
+    public Boolean getBookmark() {
+        return bookmark;
+    }
+
+    public void setBookmark(Boolean bookmark) {
+        this.bookmark = bookmark;
+    }
+
+    public ArrayList<Map<String, Object>> getChildrenTodo() {
+        return childrenTodo;
+    }
+
+    public void setChildrenTodo(ArrayList<Map<String, Object>> childrenTodo) {
+        this.childrenTodo = childrenTodo;
     }
 
     public void toEquals(Todo originalTodo) {

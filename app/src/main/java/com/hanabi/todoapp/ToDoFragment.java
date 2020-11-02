@@ -171,7 +171,8 @@ public class ToDoFragment extends Fragment
 
     @Override
     public void onCheckBookmark(Todo todo) {
-
+        todo.setBookmark(!todo.getBookmark());
+        todoDao.updateTodo(todo);
     }
 
     @Override

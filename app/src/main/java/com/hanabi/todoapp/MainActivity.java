@@ -181,11 +181,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSuccess(Void aVoid) {
-        Toast.makeText(this, "done", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
     public void onFailure(@NonNull Exception e) {
-        Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
     }
 }

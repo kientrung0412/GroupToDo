@@ -63,6 +63,7 @@
         android:orientation="horizontal">
 
         <EditText
+            android:imeOptions="actionDone"
             android:id="@+id/edt_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
