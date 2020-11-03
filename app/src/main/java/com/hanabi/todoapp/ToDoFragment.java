@@ -98,8 +98,8 @@ public class ToDoFragment extends Fragment
 
         adapterNew.setListener(this);
         adapterDone.setListener(this);
-        srlReload.setOnRefreshListener(this);
         fabAdd.setOnClickListener(this);
+        srlReload.setOnRefreshListener(this);
         srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
         rcvTodoNew.setAdapter(adapterNew);
         rcvTodoDone.setAdapter(adapterDone);
@@ -204,7 +204,6 @@ public class ToDoFragment extends Fragment
                     adapterNew.setData(todos);
                     return;
                 }
-
                 for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                     Todo todo = document.toObject(Todo.class);
                     todos.add(todo);
@@ -212,7 +211,6 @@ public class ToDoFragment extends Fragment
                 setAnimation(rcvTodoNew);
                 adapterNew.setData(todos);
                 break;
-
             case Todo.TODO_STATUS_DONE:
                 if (queryDocumentSnapshots.isEmpty()) {
                     llMore.setVisibility(View.GONE);
@@ -237,7 +235,6 @@ public class ToDoFragment extends Fragment
         Snackbar.make(rcvTodoNew, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
                 view -> todoDao.updateTodo(todo)).show();
     }
-
 
     private void setAnimation(RecyclerView recyclerView) {
         LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.layout_animation);
@@ -347,7 +344,6 @@ public class ToDoFragment extends Fragment
         }
         toggleMore();
     }
-
 
     private void toggleMore() {
         if (adapterDone.getData() != null) {

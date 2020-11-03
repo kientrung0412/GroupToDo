@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     private CircleImageView civAvatar;
 
     private ToDoFragment toDoFragment = new ToDoFragment();
+    private TodoBookmarkFragment bookmarkFragment = new TodoBookmarkFragment();
     private FirebaseMessaging fcm = FirebaseMessaging.getInstance();
 
     @Override
@@ -114,12 +115,14 @@ public class MainActivity extends AppCompatActivity
     private void initFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fl_main, toDoFragment);
+        transaction.add(R.id.fl_main, bookmarkFragment);
         transaction.commit();
     }
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.hide(toDoFragment);
+        transaction.hide(bookmarkFragment);
         transaction.show(fragment);
         transaction.commit();
     }
@@ -152,6 +155,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.it_today_todo:
                 showFragment(toDoFragment);
                 setTitle(toDoFragment.getTitleToolBar());
+                break;
+            case R.id.it_bookmark_todo:
+                showFragment(bookmarkFragment);
+                setTitle(bookmarkFragment.getTitle());
                 break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
