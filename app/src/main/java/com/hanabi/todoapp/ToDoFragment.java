@@ -114,18 +114,14 @@ public class ToDoFragment extends Fragment
     }
 
     private void realtimeUpdate() {
-
-        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW);
-        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE);
+        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW, TodoDao.BOOKMARK_NONE);
+        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE, TodoDao.BOOKMARK_NONE);
         todoDao.setRealTimeUpdate(this);
-//        todoDao.realtimeUpdateTodos();
     }
 
     private void loadingData() {
-
-        todoDao.getTodos(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW);
-        todoDao.getTodos(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE);
-
+        todoDao.getTodos(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW, TodoDao.BOOKMARK_NONE);
+        todoDao.getTodos(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE, TodoDao.BOOKMARK_NONE);
     }
 
     @Override
@@ -240,11 +236,6 @@ public class ToDoFragment extends Fragment
     public void deleteTodoSuccess(Todo todo) {
         Snackbar.make(rcvTodoNew, "Thành công", Snackbar.LENGTH_LONG).setAction("Hoàn tác",
                 view -> todoDao.updateTodo(todo)).show();
-    }
-
-    @Override
-    public void realtimeUpdateSuccess() {
-        loadingData();
     }
 
 

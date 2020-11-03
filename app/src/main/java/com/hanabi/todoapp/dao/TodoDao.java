@@ -27,6 +27,10 @@ import java.util.concurrent.TimeUnit;
 
 public class TodoDao {
 
+    public static final int BOOKMARK_TRUE = 1;
+    public static final int BOOKMARK_NONE = -1;
+    public static final int BOOKMARK_FALSE = 0;
+
     public static ArrayList<Todo> todos;
 
     private Calendar calendarNow = Calendar.getInstance();
@@ -63,7 +67,7 @@ public class TodoDao {
         this.realTimeUpdate = realTimeUpdate;
     }
 
-    public void getTodos(Date startDate, Date endDate, int status) {
+    public void getTodos(Date startDate, Date endDate, int status, int bookmark) {
 
         Query querySnapshotTask = reference.whereEqualTo("status", status);
 
@@ -73,6 +77,12 @@ public class TodoDao {
 
         if (endDate != null) {
             querySnapshotTask = querySnapshotTask.whereGreaterThan("createdAt", endDate);
+        }
+
+        if (bookmark == BOOKMARK_TRUE) {
+            querySnapshotTask = querySnapshotTask.whereEqualTo("bookmark", true);
+        } else if (bookmark == BOOKMARK_FALSE) {
+            querySnapshotTask = querySnapshotTask.whereEqualTo("bookmark", false);
         }
 
         querySnapshotTask
@@ -210,19 +220,8 @@ public class TodoDao {
                 .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    public void realtimeUpdateTodos() {
-        reference.addSnapshotListener((snapshots, error) -> {
-            if (error != null) {
-                Toast.makeText(activity, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            listener.realtimeUpdateSuccess();
-        });
-    }
-
-    public void realtimeUpdate(Date startDate, Date endDate, int status) {
+    public void realtimeUpdate(Date startDate, Date endDate, int status, int bookmark) {
         Query querySnapshotTask = reference.whereEqualTo("status", status);
-
 
         if (startDate != null) {
             querySnapshotTask = querySnapshotTask.whereLessThan("createdAt", startDate);
@@ -230,6 +229,12 @@ public class TodoDao {
 
         if (endDate != null) {
             querySnapshotTask = querySnapshotTask.whereGreaterThan("createdAt", endDate);
+        }
+
+        if (bookmark == BOOKMARK_TRUE) {
+            querySnapshotTask = querySnapshotTask.whereEqualTo("bookmark", true);
+        } else if (bookmark == BOOKMARK_FALSE) {
+            querySnapshotTask = querySnapshotTask.whereEqualTo("bookmark", false);
         }
 
         querySnapshotTask
@@ -325,7 +330,6 @@ public class TodoDao {
 
         void deleteTodoSuccess(Todo todo);
 
-        void realtimeUpdateSuccess();
     }
 
     public interface RemindTodoListener {

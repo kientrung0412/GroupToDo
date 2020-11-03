@@ -25,4 +25,7 @@
     <string name="today">Hôm nay</string>
     <string name="bookmark">Danh sách quan trọng</string>
     <string name="list_todo">Danh sách tác vụ</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="configure">Configure</string>
 </resources>
