@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Todo implements Serializable {
 
@@ -112,7 +113,25 @@ public class Todo implements Serializable {
         setCreatedAt(originalTodo.getCreatedAt());
         setLoop(originalTodo.getLoop());
         setRemindDate(originalTodo.getRemindDate());
-        setLoopTodoMap(originalTodo.getLoopTodoMap());
         setCompletedDate(originalTodo.getCompletedDate());
+        setBookmark(originalTodo.getBookmark());
+        setChildrenTodo(originalTodo.childrenTodo);
+        setLoopTodoMap(originalTodo.loopTodoMap);
+    }
+
+    @Override
+    public String toString() {
+        return "Todo{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", isLoop=" + isLoop +
+                ", remindDate=" + remindDate +
+                ", completedDate=" + completedDate +
+                ", bookmark=" + bookmark +
+                ", childrenTodo=" + childrenTodo +
+                ", loopTodoMap=" + loopTodoMap +
+                '}';
     }
 }

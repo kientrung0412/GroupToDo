@@ -61,14 +61,11 @@ public class ChildrenTodoAdapter extends RecyclerView.Adapter<ChildrenTodoAdapte
         if (listener != null) {
             holder.imageView.setOnClickListener(view -> listener.onClickRemoveChildren(position));
             holder.cbDone.setOnClickListener(view -> listener.onClickCheck(position));
-            holder.edtContent.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                    if (i == EditorInfo.IME_ACTION_DONE && !holder.edtContent.getText().toString().isEmpty()) {
-                        listener.onClickUpdateChildren(position, holder.edtContent.getText().toString());
-                    }
-                    return false;
+            holder.edtContent.setOnEditorActionListener((textView, i, keyEvent) -> {
+                if (i == EditorInfo.IME_ACTION_DONE && !holder.edtContent.getText().toString().isEmpty()) {
+                    listener.onClickUpdateChildren(position, holder.edtContent.getText().toString());
                 }
+                return false;
             });
 //            if (activity != null) {
 //                KeyboardVisibilityEvent.setEventListener(activity, b -> {
@@ -107,7 +104,6 @@ public class ChildrenTodoAdapter extends RecyclerView.Adapter<ChildrenTodoAdapte
             edtContent.setRawInputType(InputType.TYPE_CLASS_TEXT);
             edtContent.setText(childrenTodo.get("content").toString());
             cbDone.setChecked(((boolean) childrenTodo.get("isDone")));
-//            cbDone.setChecked((Boolean) childrenTodo.get("done"));
         }
     }
 

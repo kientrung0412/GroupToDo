@@ -2,6 +2,7 @@ package com.hanabi.todoapp;
 
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +24,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -41,7 +44,7 @@ import java.util.Date;
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class ToDoFragment extends Fragment
-        implements View.OnClickListener, MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, TodoDao.DataChangeListener {
+        implements View.OnClickListener, MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, TodoDao.DataChangeListener, TodoDao.OnRealTimeUpdate {
 
     public static final String TAG = ToDoFragment.class.getName();
     private String titleToolBar = "Hôm nay";
@@ -74,6 +77,7 @@ public class ToDoFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+
         todoDao.setActivity(getActivity());
         tvCountDone = getActivity().findViewById(R.id.tv_count_done);
         rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new);
@@ -109,8 +113,12 @@ public class ToDoFragment extends Fragment
         realtimeUpdate();
     }
 
-    private void  realtimeUpdate() {
-        todoDao.realtimeUpdateTodos();
+    private void realtimeUpdate() {
+
+        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW);
+        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE);
+        todoDao.setRealTimeUpdate(this);
+//        todoDao.realtimeUpdateTodos();
     }
 
     private void loadingData() {
@@ -256,11 +264,10 @@ public class ToDoFragment extends Fragment
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         Todo todo = adapter.getData().get(viewHolder.getAdapterPosition());
-                        switch (direction) {
-                            case ItemTouchHelper.LEFT:
-                                todoDao.deleteTodo(todo);
-                                break;
-                        }
+                        adapter.getData().remove(todo);
+                        adapter.notifyDataSetChanged();
+
+                        todoDao.deleteTodo(todo);
                     }
 
                     @Override
@@ -277,5 +284,87 @@ public class ToDoFragment extends Fragment
                 };
 
         new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public void todoUpdate(Todo todo) {
+
+    }
+
+    @Override
+    public void add(Todo todo) {
+        switch (todo.getStatus()) {
+            case Todo.TODO_STATUS_DONE:
+                if (adapterDone.getData() == null) {
+                    break;
+                }
+                adapterDone.getData().add(0, todo);
+                adapterDone.notifyDataSetChanged();
+                break;
+            case Todo.TODO_STATUS_NEW:
+                if (adapterNew.getData() == null) {
+                    break;
+                }
+                adapterNew.getData().add(0, todo);
+                adapterNew.notifyDataSetChanged();
+                break;
+        }
+        toggleMore();
+    }
+
+    @Override
+    public void remove(Todo todo) {
+        Todo todoRemove;
+        switch (todo.getStatus()) {
+            case Todo.TODO_STATUS_DONE:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    todoRemove = adapterDone.getData().stream().filter(td -> td.getId() == todo.getId()).findAny().orElse(null);
+                    adapterDone.getData().remove(todoRemove);
+                }
+                adapterDone.notifyDataSetChanged();
+                break;
+            case Todo.TODO_STATUS_NEW:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    todoRemove = adapterNew.getData().stream().filter(td -> td.getId() == todo.getId()).findAny().orElse(null);
+                    adapterNew.getData().remove(todoRemove);
+                }
+                adapterNew.notifyDataSetChanged();
+                break;
+        }
+        toggleMore();
+    }
+
+    @Override
+    public void modified(Todo todo) {
+        Todo todoModified;
+        switch (todo.getStatus()) {
+            case Todo.TODO_STATUS_DONE:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    todoModified = adapterDone.getData().stream().filter(td -> td.getId() == todo.getId()).findAny().orElse(null);
+                    todoModified.toEquals(todo);
+                    adapterDone.notifyDataSetChanged();
+                }
+
+                break;
+            case Todo.TODO_STATUS_NEW:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    todoModified = adapterNew.getData().stream().filter(td -> td.getId() == todo.getId()).findAny().orElse(null);
+                    todoModified.toEquals(todo);
+                    adapterNew.notifyDataSetChanged();
+                }
+                break;
+        }
+        toggleMore();
+    }
+
+
+    private void toggleMore() {
+        if (adapterDone.getData() != null) {
+            llMore.setVisibility(View.VISIBLE);
+            tvCountDone.setText(adapterDone.getData().size() + "");
+            if (adapterDone.getData().size() <= 0) {
+                llMore.setVisibility(View.GONE);
+            }
+        }
     }
 }

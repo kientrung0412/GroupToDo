@@ -220,6 +220,43 @@ public class TodoDao {
         });
     }
 
+    public void realtimeUpdate(Date startDate, Date endDate, int status) {
+        Query querySnapshotTask = reference.whereEqualTo("status", status);
+
+
+        if (startDate != null) {
+            querySnapshotTask = querySnapshotTask.whereLessThan("createdAt", startDate);
+        }
+
+        if (endDate != null) {
+            querySnapshotTask = querySnapshotTask.whereGreaterThan("createdAt", endDate);
+        }
+
+        querySnapshotTask
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Toast.makeText(activity, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED:
+                                realTimeUpdate.add(dc.getDocument().toObject(Todo.class));
+                                break;
+                            case MODIFIED:
+                                realTimeUpdate.modified(dc.getDocument().toObject(Todo.class));
+                                break;
+                            case REMOVED:
+                                realTimeUpdate.remove(dc.getDocument().toObject(Todo.class));
+                                break;
+                        }
+                    }
+
+                });
+    }
+
     public void realtimeUpdateTodo(String todoId) {
         reference.document(todoId)
                 .addSnapshotListener((snapshots, error) -> {
@@ -260,20 +297,19 @@ public class TodoDao {
             }
 
             for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                switch (dc.getType()) {
-                    case ADDED:
-
-                        break;
-                    case MODIFIED:
-
-                        break;
-                    case REMOVED:
-
-                        break;
-                    default:
-                        break;
+                if (realTimeUpdate != null) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            realTimeUpdate.add(dc.getDocument().toObject(Todo.class));
+                            break;
+                        case MODIFIED:
+                            realTimeUpdate.modified(dc.getDocument().toObject(Todo.class));
+                            break;
+                        case REMOVED:
+                            realTimeUpdate.remove(dc.getDocument().toObject(Todo.class));
+                            break;
+                    }
                 }
-
             }
         });
     }
@@ -298,5 +334,11 @@ public class TodoDao {
 
     public interface OnRealTimeUpdate {
         void todoUpdate(Todo todo);
+
+        void add(Todo todo);
+
+        void remove(Todo todo);
+
+        void modified(Todo todo);
     }
 }

@@ -128,9 +128,27 @@ public class DetailTodoActivity extends AppCompatActivity
 
     private void realtimeUpdate() {
         todoDao.realtimeUpdateTodo(todo.getId() + "");
-        todoDao.setRealTimeUpdate(todo -> {
-            this.todo = todo;
-            bindViews();
+        todoDao.setRealTimeUpdate(new TodoDao.OnRealTimeUpdate() {
+            @Override
+            public void todoUpdate(Todo todo) {
+                DetailTodoActivity.this.todo = todo;
+                bindViews();
+            }
+
+            @Override
+            public void add(Todo todo) {
+
+            }
+
+            @Override
+            public void remove(Todo todo) {
+
+            }
+
+            @Override
+            public void modified(Todo todo) {
+
+            }
         });
     }
 
