@@ -54,13 +54,13 @@
         </LinearLayout>
     </LinearLayout>
 
-    <com.hanabi.todoapp.views.CustomCheckbox
-        android:id="@+id/ccb_bookmark"
+    <CheckBox
+        android:id="@+id/cb_bookmark"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_gravity="center"
         android:layout_marginLeft="8dp"
-        app:lottie_rawRes="@raw/cb_star" />
+        android:button="@drawable/cb_customer" />
 
 </LinearLayout>
 

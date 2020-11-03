@@ -31,7 +31,6 @@ import com.hanabi.todoapp.models.ChildrenTodo;
 import com.hanabi.todoapp.models.LoopTodo;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.utils.ManageDate;
-import com.hanabi.todoapp.views.CustomCheckbox;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
@@ -52,7 +51,7 @@ public class DetailTodoActivity extends AppCompatActivity
     public static final int TAG_EMPTY = 1;
     public static final int TAG_NOT_EMPTY = 2;
 
-    private CustomCheckbox ccbBookmark;
+    private CheckBox cbBookmark;
     private EditText edtContentChildren, edtContent;
     private LinearLayout llAddChildren, llSetTime, llLoop, llRemind;
     private TextView tvSetTime, tvLoop, tvRemind;
@@ -89,7 +88,7 @@ public class DetailTodoActivity extends AppCompatActivity
         Intent intent = getIntent();
         todo = (Todo) intent.getSerializableExtra(MainActivity.EXTRA_DETAIL_TODO);
 
-        ccbBookmark = findViewById(R.id.ccb_bookmark);
+        cbBookmark = findViewById(R.id.cb_bookmark);
         edtContentChildren = findViewById(R.id.edt_content_children);
         llAddChildren = findViewById(R.id.ll_add_children_todo);
         llSetTime = findViewById(R.id.ll_set_time);
@@ -117,7 +116,7 @@ public class DetailTodoActivity extends AppCompatActivity
         llRemind.setOnClickListener(this);
         llSetTime.setOnClickListener(this);
         cbStatus.setOnClickListener(this);
-        ccbBookmark.setOnClickListener(this);
+        cbBookmark.setOnClickListener(this);
         toolbar.setNavigationOnClickListener(this);
 
         adapter.setListener(this, this);
@@ -143,7 +142,7 @@ public class DetailTodoActivity extends AppCompatActivity
         tvRemind.setTag(TAG_EMPTY);
         tvLoop.setTag(TAG_EMPTY);
         tvSetTime.setTag(TAG_EMPTY);
-        ccbBookmark.setCheck(todo.getBookmark());
+        cbBookmark.setChecked(todo.getBookmark());
 
         //lặp
         if (todo.getLoop()) {
@@ -248,7 +247,7 @@ public class DetailTodoActivity extends AppCompatActivity
             case -1:
                 finish();
                 break;
-            case R.id.ccb_bookmark:
+            case R.id.cb_bookmark:
                 todo.setBookmark(!todo.getBookmark());
                 todoDao.updateTodo(todo);
                 break;

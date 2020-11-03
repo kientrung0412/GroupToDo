@@ -25,17 +25,16 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <LinearLayout
-            android:outlineSpotShadowColor="@color/colorBlack"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorWhite"
+            android:outlineSpotShadowColor="@color/colorBlack"
             android:padding="8dp">
 
             <CheckBox
@@ -56,12 +55,13 @@
                 android:textColor="@color/colorBlack"
                 android:textSize="24sp" />
 
-            <com.hanabi.todoapp.views.CustomCheckbox
-                android:id="@+id/ccb_bookmark"
+            <CheckBox
+                android:id="@+id/cb_bookmark"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                app:lottie_rawRes="@raw/cb_star" />
+                android:layout_marginLeft="8dp"
+                android:button="@drawable/cb_customer" />
 
 
         </LinearLayout>
@@ -216,7 +216,6 @@
                 </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-
 
 
     </LinearLayout>

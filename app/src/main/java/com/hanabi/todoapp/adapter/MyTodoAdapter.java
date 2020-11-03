@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.R;
-import com.hanabi.todoapp.views.CustomCheckbox;
 
 import java.util.ArrayList;
 
@@ -58,7 +57,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         holder.bindView(todo);
 
         if (listener != null) {
-            holder.ccbStar.setOnClickListener(view -> listener.onCheckBookmark(todo));
+            holder.cbStar.setOnClickListener(view -> listener.onCheckBookmark(todo));
             holder.cbDone.setOnClickListener(view -> listener.onChangeCheckbox(todo));
 
             holder.itemView.setOnClickListener(view -> listener.onClickMyTodo(todo));
@@ -77,15 +76,14 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
     public class HolderMyTodo extends RecyclerView.ViewHolder {
 
         private TextView tvContent, tvTime;
-        private CheckBox cbDone;
+        private CheckBox cbDone, cbStar;
         private ImageView ivLoop;
-        private CustomCheckbox ccbStar;
 
         public HolderMyTodo(@NonNull View itemView) {
             super(itemView);
             tvContent = itemView.findViewById(R.id.edt_content_todo);
             ivLoop = itemView.findViewById(R.id.iv_loop);
-            ccbStar = itemView.findViewById(R.id.ccb_bookmark);
+            cbStar = itemView.findViewById(R.id.cb_bookmark);
 //            tvTime = itemView.findViewById(R.id.tv_todo_create_at);
             cbDone = itemView.findViewById(R.id.cb_done);
         }
@@ -98,7 +96,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
                 ivLoop.setVisibility(View.GONE);
             }
 
-            ccbStar.setCheck(todo.getBookmark());
+            cbStar.setChecked(todo.getBookmark());
 
             switch (todo.getStatus()) {
                 case Todo.TODO_STATUS_NEW:
