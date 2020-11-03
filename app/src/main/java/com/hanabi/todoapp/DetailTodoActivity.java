@@ -477,14 +477,8 @@ public class DetailTodoActivity extends AppCompatActivity
 
                     @Override
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                        Toast.makeText(DetailTodoActivity.this, "" + direction, Toast.LENGTH_SHORT).show();
-//                        todo.getChildrenTodo().remove(direction);
-//                        todoDao.updateTodo(todo);
-//                        switch (direction) {
-//                            case ItemTouchHelper.LEFT:
-//                                todoDao.deleteTodo(todo);
-//                                break;
-//                        }
+                        todo.getChildrenTodo().remove(viewHolder.getAdapterPosition());
+                        todoDao.updateTodo(todo);
                     }
 
                     @Override
