@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -170,27 +171,32 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
             case R.id.it_loop_day:
                 loopTodo.setDays(1);
                 isLoop = true;
-                chipClick(cpLoop, "Mỗi ngày");
+                chipClick(cpLoop, loopTodo.toString());
                 break;
             case R.id.it_loop_week:
                 loopTodo.setMonday(true);
                 loopTodo.setDays(7);
                 isLoop = true;
-                chipClick(cpLoop, "Mỗi tuần vào Thứ Hai");
+                chipClick(cpLoop, loopTodo.toString());
                 break;
             case R.id.it_loop_moth:
                 loopTodo.setMonths(1);
                 isLoop = true;
-                chipClick(cpLoop, "Mỗi tháng");
+                chipClick(cpLoop, loopTodo.toString());
                 break;
             case R.id.it_loop_year:
                 loopTodo.setYears(1);
                 isLoop = true;
-                chipClick(cpLoop, "Mỗi năm");
+                chipClick(cpLoop, loopTodo.toString());
                 break;
             case R.id.it_loop_custom:
                 isLoop = true;
-//                chipCheck(cpLoop, "Mỗi ngày");
+                CustomerLoopDialog dialog = new CustomerLoopDialog(getActivity());
+                dialog.show();
+                dialog.setListener(loopTodo -> {
+                    this.loopTodo = loopTodo;
+                    chipClick(cpLoop, loopTodo.toString());
+                });
                 break;
         }
         return true;

@@ -31,9 +31,10 @@ public class RemindPickDateDialog implements View.OnClickListener {
 
     public RemindPickDateDialog(Activity activity) {
         this.activity = activity;
+        initViews();
     }
 
-    public void showDialog() {
+    private void initViews() {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         LayoutInflater layoutInflater = activity.getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.dialog_pick_time_remind_todo, null);
@@ -56,6 +57,9 @@ public class RemindPickDateDialog implements View.OnClickListener {
 
         builder.setView(view);
         dialog = builder.create();
+    }
+
+    public void showDialog() {
         dialog.show();
     }
 

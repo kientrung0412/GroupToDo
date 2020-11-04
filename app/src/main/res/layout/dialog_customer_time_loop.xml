@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left">
+
+        <EditText
+            android:id="@+id/edt_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginRight="8dp"
+            android:inputType="number" />
+
+        <Spinner
+            android:id="@+id/spn_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:spinnerMode="dropdown" />
+
+    </LinearLayout>
+
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/fbl_day_week"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:flexWrap="wrap"
+        app:justifyContent="center">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="4dp">
+
+            <CheckBox
+                android:id="@+id/cb_mon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_day_of_week"
+                android:button="@color/colorPrimary"
+                android:gravity="center"
+                android:text="T2" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="4dp">
+
+            <CheckBox
+                android:id="@+id/cb_tues"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_day_of_week"
+                android:button="@color/colorPrimary"
+                android:gravity="center"
+                android:text="T3" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="4dp">
+
+            <CheckBox
+                android:id="@+id/cb_wed"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_day_of_week"
+                android:button="@color/colorPrimary"
+                android:gravity="center"
+                android:text="T4" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="4dp">
+
+            <CheckBox
+                android:id="@+id/cb_thurs"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_day_of_week"
+                android:button="@color/colorPrimary"
+                android:gravity="center"
+                android:text="T5" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="4dp">
+
+            <CheckBox
+                android:id="@+id/cb_fri"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_day_of_week"
+                android:button="@color/colorPrimary"
+                android:gravity="center"
+                android:text="T6" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="4dp">
+
+            <CheckBox
+                android:id="@+id/cb_sat"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_day_of_week"
+                android:button="@color/colorPrimary"
+                android:gravity="center"
+                android:text="T7"
+                android:textColor="@color/colorBlack" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="4dp">
+
+            <CheckBox
+                android:id="@+id/cb_sun"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_day_of_week"
+                android:button="@color/colorPrimary"
+                android:gravity="center"
+                android:text="CN" />
+
+        </LinearLayout>
+
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/tv_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="LƯU"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/tv_save"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="HỦY BỎ"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+</LinearLayout>

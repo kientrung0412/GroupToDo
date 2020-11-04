@@ -132,10 +132,6 @@ public class ToDoFragment extends Fragment
     }
 
     @Override
-    public void onClickLongMyTodo(Todo todo) {
-    }
-
-    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_add_my_todo:

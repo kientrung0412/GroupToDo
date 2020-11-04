@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.hanabi.todoapp.adapter.ChildrenTodoAdapter;
 import com.hanabi.todoapp.dao.TodoDao;
+import com.hanabi.todoapp.dialog.CustomerLoopDialog;
 import com.hanabi.todoapp.dialog.RemindPickDateDialog;
 import com.hanabi.todoapp.models.ChildrenTodo;
 import com.hanabi.todoapp.models.LoopTodo;
@@ -361,9 +362,13 @@ public class DetailTodoActivity extends AppCompatActivity
                 break;
             case R.id.it_loop_custom:
                 todo.setLoop(true);
-//                todo.setLoopTodoMap(loopTodo.toMap());
-//                chipCheck(cpLoop, "Mỗi ngày");
-                break;
+                CustomerLoopDialog dialog = new CustomerLoopDialog(this);
+                dialog.show();
+                dialog.setListener(loopTodo -> {
+                    todo.setLoopTodoMap(loopTodo.toMap());
+                    todoDao.updateTodo(todo);
+                });
+                return true;
         }
 
         todoDao.updateTodo(todo);

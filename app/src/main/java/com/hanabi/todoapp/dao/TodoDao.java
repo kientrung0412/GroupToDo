@@ -225,7 +225,11 @@ public class TodoDao {
     }
 
     public void realtimeUpdate(Date startDate, Date endDate, int status, int bookmark) {
-        Query querySnapshotTask = reference.whereEqualTo("status", status);
+        Query querySnapshotTask = reference;
+
+        if (status == Todo.TODO_STATUS_DONE || status == Todo.TODO_STATUS_NEW) {
+            querySnapshotTask = reference.whereEqualTo("status", status);
+        }
 
         if (startDate != null) {
             querySnapshotTask = querySnapshotTask.whereLessThan("createdAt", startDate);

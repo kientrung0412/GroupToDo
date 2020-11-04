@@ -83,4 +83,55 @@ public class LoopTodo {
         saturday = false;
         sunday = false;
     }
+
+    @Override
+    public String toString() {
+        String aboutTime = "";
+        String listDay = "";
+
+        if (days > 0) {
+            if (days % 7 == 0) {
+                aboutTime = days / 7 + " tuần";
+
+                if (monday) {
+                    listDay += "Thứ Hai, ";
+                }
+                if (tuesday) {
+                    listDay += "Thứ Ba, ";
+                }
+                if (wednesday) {
+                    listDay += "Thứ Tư, ";
+                }
+                if (thursday) {
+                    listDay += "Thứ Năm, ";
+                }
+                if (friday) {
+                    listDay += "Thứ Sáu, ";
+                }
+                if (saturday) {
+                    listDay += "Thứ Bảy, ";
+                }
+                if (sunday) {
+                    listDay += "Chủ Nhật, ";
+                }
+
+            } else {
+                aboutTime = days + " ngày";
+            }
+        }
+        if (months > 0) {
+            aboutTime = months + " tháng";
+        }
+        if (years > 0) {
+            aboutTime = years + " năm";
+        }
+
+
+        String loopStr = String.format("Lặp lại mỗi %s", aboutTime);
+        if (!listDay.isEmpty()) {
+            loopStr += " vào " + listDay.trim().substring(0, listDay.length() - 2);
+        }
+
+        return loopStr;
+    }
 }

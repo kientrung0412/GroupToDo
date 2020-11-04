@@ -1,5 +1,6 @@
 package com.hanabi.todoapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTimeUpdate, TodoDao.DataChangeListener, SwipeRefreshLayout.OnRefreshListener {
+public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTimeUpdate, TodoDao.DataChangeListener, SwipeRefreshLayout.OnRefreshListener, MyTodoAdapter.OnClickMyTodoListener {
 
     public final String title = "Quan trọng";
 
@@ -60,6 +61,7 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
         srlReload.setOnRefreshListener(this);
         srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
         todoDao.setListener(this);
+        adapter.setListener(this);
         rcvBookmarks.setAdapter(adapter);
         loadingData();
         realtimeData();
@@ -82,7 +84,7 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
     @Override
     public void add(Todo todo) {
         if (adapter.getData() != null) {
-            adapter.getData().add(todo);
+            adapter.getData().add(0, todo);
             adapter.notifyDataSetChanged();
         }
     }
@@ -134,5 +136,34 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
     public void onRefresh() {
         loadingData();
         srlReload.setRefreshing(false);
+    }
+
+    @Override
+    public void onClickMyTodo(Todo todo) {
+        Intent intent = new Intent(getActivity(), DetailTodoActivity.class);
+        intent.putExtra(MainActivity.EXTRA_DETAIL_TODO, todo);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onChangeCheckbox(Todo todo) {
+        switch (todo.getStatus()) {
+            case Todo.TODO_STATUS_NEW:
+                todo.setCompletedDate(now);
+                todo.setStatus(Todo.TODO_STATUS_DONE);
+                todoDao.updateTodo(todo);
+                break;
+            case Todo.TODO_STATUS_DONE:
+                todo.setCompletedDate(null);
+                todo.setStatus(Todo.TODO_STATUS_NEW);
+                todoDao.updateTodo(todo);
+                break;
+        }
+    }
+
+    @Override
+    public void onCheckBookmark(Todo todo) {
+        todo.setBookmark(!todo.getBookmark());
+        todoDao.updateTodo(todo);
     }
 }

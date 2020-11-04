@@ -59,12 +59,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         if (listener != null) {
             holder.cbStar.setOnClickListener(view -> listener.onCheckBookmark(todo));
             holder.cbDone.setOnClickListener(view -> listener.onChangeCheckbox(todo));
-
             holder.itemView.setOnClickListener(view -> listener.onClickMyTodo(todo));
-            holder.itemView.setOnLongClickListener(view -> {
-                listener.onClickLongMyTodo(todo);
-                return true;
-            });
         }
     }
 
@@ -117,8 +112,6 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
     public interface OnClickMyTodoListener {
         void onClickMyTodo(Todo todo);
-
-        void onClickLongMyTodo(Todo todo);
 
         void onChangeCheckbox(Todo todo);
 
