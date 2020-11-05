@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -13,9 +14,11 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -42,10 +45,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, OnSuccessListener<Void>, OnFailureListener {
-
     public static final int REQUEST_CODE_OFF = 1;
-
     public static final String EXTRA_DETAIL_TODO = "extra.DETAIL_TODO";
+
+    private WorkManager workManager;
 
     private MaterialToolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity
 
 
     private void setupWork() {
+        workManager = WorkManager.getInstance(this);
         PeriodicWorkRequest periodicWork =
                 new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 15, TimeUnit.MINUTES)
                         .setBackoffCriteria(
@@ -83,7 +87,7 @@ public class MainActivity extends AppCompatActivity
                                 OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
                                 TimeUnit.MILLISECONDS)
                         .build();
-        WorkManager.getInstance(this).enqueue(periodicWork);
+        workManager.enqueue(periodicWork);
     }
 
     private void initViews() {
@@ -194,5 +198,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onFailure(@NonNull Exception e) {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        return true;
     }
 }

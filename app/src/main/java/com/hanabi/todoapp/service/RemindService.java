@@ -1,5 +1,7 @@
 package com.hanabi.todoapp.service;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.FirebaseDatabase;
@@ -17,6 +19,9 @@ public class RemindService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        super.onMessageReceived(remoteMessage);
-    }
+//        super.onMessageReceived(remoteMessage);
+        Toast.makeText(this, remoteMessage.getMessageId(), Toast.LENGTH_SHORT).show();
+}
+
+
 }

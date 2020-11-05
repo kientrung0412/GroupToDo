@@ -154,8 +154,9 @@ public class DetailTodoActivity extends AppCompatActivity
     }
 
     private void bindViews() {
-        adapter.setData(todo.getChildrenTodo());
-
+        if (todo.getChildrenTodo() != null ){
+            adapter.setData(todo.getChildrenTodo());
+        }
         edtContent.setText(todo.getContent());
         cbStatus.setChecked(todo.getStatus() == Todo.TODO_STATUS_DONE);
         tvRemind.setTag(TAG_EMPTY);

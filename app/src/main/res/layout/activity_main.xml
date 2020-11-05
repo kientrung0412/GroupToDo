@@ -11,7 +11,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@mipmap/bg_1">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/abl_main"
@@ -23,8 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:theme="@style/AppTheme.Toolbar"
-                app:navigationIcon="@drawable/ic_baseline_menu_24"
-                app:title="">
+                app:navigationIcon="@drawable/ic_baseline_menu_24">
 
             </com.google.android.material.appbar.MaterialToolbar>
 
@@ -34,7 +34,8 @@
             android:id="@+id/fl_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/abl_main" />
+            android:layout_below="@+id/abl_main"
+            android:paddingHorizontal="8dp" />
 
 
     </RelativeLayout>

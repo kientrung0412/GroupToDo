@@ -28,4 +28,6 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="configure">Configure</string>
+    <string name="sort">Sắp xếp</string>
+    <string name="change_theme">Thay đổi chủ đề</string>
 </resources>

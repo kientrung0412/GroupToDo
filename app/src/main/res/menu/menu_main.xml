@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="nose"
+        app:showAsAction="always">
+        <item
+            android:id="@+id/it_sort"
+            android:icon="@drawable/ic_sort"
+            android:title="@string/sort" />
+
+        <item
+            android:id="@+id/it_change_theme"
+            android:icon="@drawable/ic_theme"
+            android:title="@string/change_theme" />
+    </item>
+</menu>

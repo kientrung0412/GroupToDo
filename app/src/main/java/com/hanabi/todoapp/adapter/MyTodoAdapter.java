@@ -2,6 +2,7 @@ package com.hanabi.todoapp.adapter;
 
 
 import android.graphics.Paint;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.R;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTodo> {
 
@@ -42,6 +44,18 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
         return data;
     }
 
+    public void sortByCreatedAt() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            data.sort((t1, t2) -> (int) (t2.getId() - t1.getId()));
+        }
+        notifyDataSetChanged();
+    }
+
+    public void sortByBookmark() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            data.sort((t1, t2) -> Boolean.compare(t2.getBookmark(), t1.getBookmark()));
+        }
+    }
 
     @NonNull
     @Override
@@ -79,7 +93,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
             tvContent = itemView.findViewById(R.id.edt_content_todo);
             ivLoop = itemView.findViewById(R.id.iv_loop);
             cbStar = itemView.findViewById(R.id.cb_bookmark);
-//            tvTime = itemView.findViewById(R.id.tv_todo_create_at);
+            tvTime = itemView.findViewById(R.id.tv_todo_create_at);
             cbDone = itemView.findViewById(R.id.cb_done);
         }
 

@@ -1,10 +1,14 @@
 package com.hanabi.todoapp;
 
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -23,6 +27,8 @@ import com.hanabi.todoapp.utils.ManageDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
 public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTimeUpdate, TodoDao.DataChangeListener, SwipeRefreshLayout.OnRefreshListener, MyTodoAdapter.OnClickMyTodoListener {
 
@@ -63,6 +69,9 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
         todoDao.setListener(this);
         adapter.setListener(this);
         rcvBookmarks.setAdapter(adapter);
+
+        swipeRecyclerView(rcvBookmarks, adapter);
+
         loadingData();
         realtimeData();
     }
@@ -85,7 +94,7 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
     public void add(Todo todo) {
         if (adapter.getData() != null) {
             adapter.getData().add(0, todo);
-            adapter.notifyDataSetChanged();
+            adapter.sortByCreatedAt();
         }
     }
 
@@ -165,5 +174,38 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
     public void onCheckBookmark(Todo todo) {
         todo.setBookmark(!todo.getBookmark());
         todoDao.updateTodo(todo);
+    }
+
+    private void swipeRecyclerView(RecyclerView recyclerView, MyTodoAdapter adapter) {
+        ItemTouchHelper.SimpleCallback simpleCallbackDelete =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        Todo todo = adapter.getData().get(viewHolder.getAdapterPosition());
+                        adapter.getData().remove(todo);
+                        adapter.notifyDataSetChanged();
+
+                        todoDao.deleteTodo(todo);
+                    }
+
+                    @Override
+                    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                            float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                                .addSwipeLeftActionIcon(R.drawable.ic_delete)
+                                .addSwipeLeftBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorDanger))
+                                .setSwipeLeftLabelColor(getActivity().getResources().getColor(R.color.colorWhite, null))
+                                .create()
+                                .decorate();
+                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                    }
+                };
+
+        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(recyclerView);
     }
 }

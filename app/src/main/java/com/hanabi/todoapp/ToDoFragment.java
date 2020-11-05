@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +23,6 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -181,10 +179,10 @@ public class ToDoFragment extends Fragment
         srlReload.setRefreshing(false);
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_todo, menu);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_sort_todo, menu);
+//    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -283,16 +281,18 @@ public class ToDoFragment extends Fragment
                     break;
                 }
                 adapterDone.getData().add(0, todo);
-                adapterDone.notifyDataSetChanged();
+                adapterDone.sortByCreatedAt();
                 break;
             case Todo.TODO_STATUS_NEW:
                 if (adapterNew.getData() == null) {
                     break;
                 }
                 adapterNew.getData().add(0, todo);
-                adapterNew.notifyDataSetChanged();
+                adapterNew.sortByCreatedAt();
                 break;
         }
+
+
         toggleMore();
     }
 

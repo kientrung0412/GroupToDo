@@ -283,7 +283,6 @@ public class TodoDao {
                 });
     }
 
-
     public void remindTodo() {
         reference
                 .whereNotEqualTo("remindDate", null)
@@ -332,6 +331,7 @@ public class TodoDao {
         todo.setCreatedAt(calendarNow.getTime());
         updateTodo(todo);
     }
+
 
     public interface DataChangeListener {
         void getTodoSuccess(int core, QuerySnapshot queryDocumentSnapshots);

@@ -6,17 +6,17 @@
 
     <item
         android:id="@+id/it_today_todo"
-        android:icon="@drawable/ic_work"
+        android:icon="@drawable/ic_sun"
         android:title="@string/today" />
 
     <item
         android:id="@+id/it_bookmark_todo"
-        android:icon="@drawable/ic_chat"
+        android:icon="@drawable/ic_star_solid"
         android:title="@string/bookmark" />
 
     <item
         android:id="@+id/it_list_todo"
-        android:icon="@drawable/ic_chat"
+        android:icon="@drawable/ic_todo"
         android:title="@string/list_todo" />
 
 </menu>

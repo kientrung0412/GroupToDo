@@ -27,7 +27,11 @@ public class LoopWork extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        todoDao.updeteTodoLoop();
-        return Result.success();
+        try {
+            todoDao.updeteTodoLoop();
+            return Result.success();
+        } catch (Exception e) {
+            return Result.failure();
+        }
     }
 }
