@@ -77,12 +77,12 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
     }
 
     private void realtimeData() {
-        todoDao.realtimeUpdate(null, null, Todo.TODO_STATUS_ALL, TodoDao.BOOKMARK_TRUE);
+        todoDao.realtimeUpdate(null, null, Todo.TODO_STATUS_ALL, Todo.BOOKMARK_TRUE);
         todoDao.setRealTimeUpdate(this);
     }
 
     private void loadingData() {
-        todoDao.getTodos(null, null, Todo.TODO_STATUS_ALL, TodoDao.BOOKMARK_TRUE);
+        todoDao.getTodos(null, null, Todo.TODO_STATUS_ALL, Todo.BOOKMARK_TRUE);
     }
 
     @Override

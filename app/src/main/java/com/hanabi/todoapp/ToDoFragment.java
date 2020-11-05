@@ -112,14 +112,14 @@ public class ToDoFragment extends Fragment
     }
 
     private void realtimeUpdate() {
-        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW, TodoDao.BOOKMARK_NONE);
-        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE, TodoDao.BOOKMARK_NONE);
+        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW, Todo.BOOKMARK_NONE);
+        todoDao.realtimeUpdate(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE, Todo.BOOKMARK_NONE);
         todoDao.setRealTimeUpdate(this);
     }
 
     private void loadingData() {
-        todoDao.getTodos(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW, TodoDao.BOOKMARK_NONE);
-        todoDao.getTodos(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE, TodoDao.BOOKMARK_NONE);
+        todoDao.getTodos(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_NEW, Todo.BOOKMARK_NONE);
+        todoDao.getTodos(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now), Todo.TODO_STATUS_DONE, Todo.BOOKMARK_NONE);
     }
 
     @Override

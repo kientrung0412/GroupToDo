@@ -13,6 +13,10 @@ public class Todo implements Serializable {
     public static final int TODO_STATUS_DONE = 2;
     public static final int TODO_STATUS_ALL = 3;
 
+    public static final int BOOKMARK_TRUE = 1;
+    public static final int BOOKMARK_NONE = -1;
+    public static final int BOOKMARK_FALSE = 0;
+
     public static final String TODO_COLL_MY_TODO = "my_todo";
     public static final String TODO_COLL = "todo";
 

@@ -27,10 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TodoDao {
 
-    public static final int BOOKMARK_TRUE = 1;
-    public static final int BOOKMARK_NONE = -1;
-    public static final int BOOKMARK_FALSE = 0;
-
     public static ArrayList<Todo> todos;
 
     private Calendar calendarNow = Calendar.getInstance();
@@ -83,9 +79,9 @@ public class TodoDao {
             querySnapshotTask = querySnapshotTask.whereGreaterThan("createdAt", endDate);
         }
 
-        if (bookmark == BOOKMARK_TRUE) {
+        if (bookmark == Todo.BOOKMARK_TRUE) {
             querySnapshotTask = querySnapshotTask.whereEqualTo("bookmark", true);
-        } else if (bookmark == BOOKMARK_FALSE) {
+        } else if (bookmark == Todo.BOOKMARK_FALSE) {
             querySnapshotTask = querySnapshotTask.whereEqualTo("bookmark", false);
         }
 
@@ -239,9 +235,9 @@ public class TodoDao {
             querySnapshotTask = querySnapshotTask.whereGreaterThan("createdAt", endDate);
         }
 
-        if (bookmark == BOOKMARK_TRUE) {
+        if (bookmark == Todo.BOOKMARK_TRUE) {
             querySnapshotTask = querySnapshotTask.whereEqualTo("bookmark", true);
-        } else if (bookmark == BOOKMARK_FALSE) {
+        } else if (bookmark == Todo.BOOKMARK_FALSE) {
             querySnapshotTask = querySnapshotTask.whereEqualTo("bookmark", false);
         }
 
