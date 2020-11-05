@@ -247,8 +247,6 @@ public class ToDoFragment extends Fragment
                     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                         Todo todo = adapter.getData().get(viewHolder.getAdapterPosition());
                         adapter.getData().remove(todo);
-                        adapter.notifyDataSetChanged();
-
                         todoDao.deleteTodo(todo);
                     }
 

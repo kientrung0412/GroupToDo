@@ -6,11 +6,22 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.dao.TodoDao;
+import com.hanabi.todoapp.models.Todo;
+import com.hanabi.todoapp.utils.ManageDate;
+import com.hanabi.todoapp.utils.ManagerRemind;
 
-public class ManagerRemindWork extends Worker {
+import java.util.Calendar;
+import java.util.Date;
+
+public class ManagerRemindWork extends Worker implements TodoDao.DataChangeListener {
 
     private TodoDao todoDao;
+    private ManageDate manageDate = new ManageDate();
+    private Calendar calendar = Calendar.getInstance();
+    private Date now = calendar.getTime();
 
     public ManagerRemindWork(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -20,9 +31,22 @@ public class ManagerRemindWork extends Worker {
     @Override
     public Result doWork() {
         todoDao = new TodoDao();
-        todoDao.getTodos();
+        todoDao.getTodosRedmind(manageDate.getDate(manageDate.getDateTomorrow(now)), manageDate.getDate(now));
+        todoDao.setListener(this);
+        return Result.success();
+    }
 
+    @Override
+    public void getTodoSuccess(int core, QuerySnapshot queryDocumentSnapshots) {
+        if (!queryDocumentSnapshots.isEmpty()) {
+            for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
+                ManagerRemind.getTodos().add(snapshot.toObject(Todo.class));
+            }
+        }
+    }
 
-        return null;
+    @Override
+    public void deleteTodoSuccess(Todo todo) {
+
     }
 }

@@ -92,6 +92,27 @@ public class TodoDao {
                 .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
+    public void getTodosRedmind(Date startDate, Date endDate) {
+
+        Query querySnapshotTask = reference;
+
+        querySnapshotTask = querySnapshotTask.whereEqualTo("status", Todo.TODO_STATUS_NEW);
+
+        if (startDate != null) {
+            querySnapshotTask = querySnapshotTask.whereLessThan("createdAt", startDate);
+        }
+        if (endDate != null) {
+            querySnapshotTask = querySnapshotTask.whereGreaterThan("createdAt", endDate);
+        }
+
+        querySnapshotTask.whereNotEqualTo("remindDate", null);
+
+        querySnapshotTask
+                .get()
+                .addOnSuccessListener(task -> listener.getTodoSuccess(Todo.TODO_STATUS_NEW, task))
+                .addOnFailureListener(e -> Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
     public void updeteTodoLoop() {
         reference.whereEqualTo("loop", true)
                 .get()
@@ -224,7 +245,7 @@ public class TodoDao {
         Query querySnapshotTask = reference;
 
         if (status == Todo.TODO_STATUS_DONE || status == Todo.TODO_STATUS_NEW) {
-            querySnapshotTask = reference.whereEqualTo("status", status);
+            querySnapshotTask = querySnapshotTask.whereEqualTo("status", status);
         }
 
         if (startDate != null) {

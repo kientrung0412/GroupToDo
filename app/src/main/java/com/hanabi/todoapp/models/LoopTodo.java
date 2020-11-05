@@ -1,7 +1,17 @@
 package com.hanabi.todoapp.models;
 
+import android.app.Activity;
+
+import androidx.work.BackoffPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
+import com.hanabi.todoapp.works.LoopWork;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class LoopTodo {
 
@@ -134,4 +144,16 @@ public class LoopTodo {
 
         return loopStr;
     }
+
+//    public static void habit(Activity activity) {
+//        WorkManager workManager = WorkManager.getInstance(activity);
+//        PeriodicWorkRequest periodicWorkLoop =
+//                new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 15, TimeUnit.MINUTES)
+//                        .setBackoffCriteria(
+//                                BackoffPolicy.LINEAR,
+//                                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+//                                TimeUnit.MILLISECONDS)
+//                        .build();
+//        workManager.enqueue(periodicWorkLoop);
+//    }
 }

@@ -1,40 +1,58 @@
 package com.hanabi.todoapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.hanabi.todoapp.adapter.ChildrenTodoAdapter;
 import com.hanabi.todoapp.dao.TodoDao;
+import com.hanabi.todoapp.dialog.CustomerLoopDialog;
 import com.hanabi.todoapp.dialog.RemindPickDateDialog;
+import com.hanabi.todoapp.models.ChildrenTodo;
 import com.hanabi.todoapp.models.LoopTodo;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.utils.ManageDate;
 
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-public class DetailTodoActivity extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+
+public class DetailTodoActivity extends AppCompatActivity
+        implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, TextView.OnEditorActionListener, KeyboardVisibilityEventListener, ChildrenTodoAdapter.OnClickChildrenTodoListener {
 
     public static final int TAG_EMPTY = 1;
     public static final int TAG_NOT_EMPTY = 2;
 
+    private CheckBox cbBookmark;
     private EditText edtContentChildren, edtContent;
     private LinearLayout llAddChildren, llSetTime, llLoop, llRemind;
     private TextView tvSetTime, tvLoop, tvRemind;
@@ -46,12 +64,15 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
     private LoopTodo loopTodo = new LoopTodo();
 
     private TodoDao todoDao = new TodoDao();
+    private ChildrenTodoAdapter adapter;
 
     private Calendar calendar = Calendar.getInstance();
     private ManageDate manageDate = new ManageDate();
     private Date now = calendar.getTime();
     private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
     private DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+    private boolean clickDone = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +83,14 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initViews() {
+        KeyboardVisibilityEvent.setEventListener(this, this);
+        adapter = new ChildrenTodoAdapter(getLayoutInflater());
+
         Intent intent = getIntent();
         todo = (Todo) intent.getSerializableExtra(MainActivity.EXTRA_DETAIL_TODO);
 
-        edtContent = findViewById(R.id.edt_content_children);
+        cbBookmark = findViewById(R.id.cb_bookmark);
+        edtContentChildren = findViewById(R.id.edt_content_children);
         llAddChildren = findViewById(R.id.ll_add_children_todo);
         llSetTime = findViewById(R.id.ll_set_time);
         llLoop = findViewById(R.id.ll_loop);
@@ -80,14 +105,26 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
 
         setSupportActionBar(toolbar);
 
+        edtContent.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        edtContent.setRawInputType(InputType.TYPE_CLASS_TEXT);
+        edtContentChildren.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        edtContentChildren.setRawInputType(InputType.TYPE_CLASS_TEXT);
+
+        edtContent.setOnEditorActionListener(this);
+        edtContentChildren.setOnEditorActionListener(this);
         llAddChildren.setOnClickListener(this);
         llLoop.setOnClickListener(this);
         llRemind.setOnClickListener(this);
         llSetTime.setOnClickListener(this);
         cbStatus.setOnClickListener(this);
+        cbBookmark.setOnClickListener(this);
         toolbar.setNavigationOnClickListener(this);
 
+        adapter.setListener(this, this);
+        rcvChildren.setAdapter(adapter);
         realtimeUpdate();
+
+        swipeRecyclerView(rcvChildren);
     }
 
     private void realtimeUpdate() {
@@ -117,11 +154,15 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void bindViews() {
+        if (todo.getChildrenTodo() != null ){
+            adapter.setData(todo.getChildrenTodo());
+        }
         edtContent.setText(todo.getContent());
         cbStatus.setChecked(todo.getStatus() == Todo.TODO_STATUS_DONE);
         tvRemind.setTag(TAG_EMPTY);
         tvLoop.setTag(TAG_EMPTY);
         tvSetTime.setTag(TAG_EMPTY);
+        cbBookmark.setChecked(todo.getBookmark());
 
         //lặp
         if (todo.getLoop()) {
@@ -226,13 +267,18 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
             case -1:
                 finish();
                 break;
+            case R.id.cb_bookmark:
+                todo.setBookmark(!todo.getBookmark());
+                todoDao.updateTodo(todo);
+                break;
             case R.id.ll_add_children_todo:
                 edtContent.setFocusable(true);
                 break;
             case R.id.ll_loop:
                 if (Integer.parseInt(String.valueOf(tvLoop.getTag())) == TAG_NOT_EMPTY) {
                     todo.setLoop(false);
-                    todo.setLoopTodoMap(null);
+                    loopTodo.reset();
+                    todo.setLoopTodoMap(loopTodo.toMap());
                     todoDao.updateTodo(todo);
                     resetProperty(tvLoop, "Lặp lại");
                     return;
@@ -279,7 +325,6 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
@@ -297,6 +342,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.it_loop_day:
                 loopTodo.setDays(1);
+                todo.setLoopTodoMap(loopTodo.toMap());
                 todo.setLoop(true);
                 break;
             case R.id.it_loop_week:
@@ -317,9 +363,13 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.it_loop_custom:
                 todo.setLoop(true);
-//                todo.setLoopTodoMap(loopTodo.toMap());
-//                chipCheck(cpLoop, "Mỗi ngày");
-                break;
+                CustomerLoopDialog dialog = new CustomerLoopDialog(this);
+                dialog.show();
+                dialog.setListener(loopTodo -> {
+                    todo.setLoopTodoMap(loopTodo.toMap());
+                    todoDao.updateTodo(todo);
+                });
+                return true;
         }
 
         todoDao.updateTodo(todo);
@@ -331,27 +381,143 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int yearSelect, int monthOfYearSelect, int dayOfMonthSelect) {
-                if (yearSelect - year < 0) {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, yearSelect, monthOfYearSelect, dayOfMonthSelect) -> {
+            if (yearSelect - year < 0) {
+                return;
+            }
+            if (monthOfYearSelect - month < 0) {
+                return;
+            } else if (monthOfYearSelect - month == 0) {
+                if (dayOfMonthSelect - day < 0) {
                     return;
                 }
-                if (monthOfYearSelect - month < 0) {
-                    return;
-                } else if (monthOfYearSelect - month == 0) {
-                    if (dayOfMonthSelect - day < 0) {
-                        return;
-                    }
-                }
-                try {
-                    Date date = dateFormat.parse(dayOfMonthSelect + "/" + (monthOfYearSelect + 1) + "/" + yearSelect);
-                    todo.setCreatedAt(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+            }
+            try {
+                Date date = dateFormat.parse(dayOfMonthSelect + "/" + (monthOfYearSelect + 1) + "/" + yearSelect);
+                todo.setCreatedAt(date);
+                todoDao.updateTodo(todo);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }, year, month, day);
         datePickerDialog.show();
+    }
+
+    @Override
+    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+        if (i == EditorInfo.IME_ACTION_DONE) {
+            clickDone = true;
+            switch (textView.getId()) {
+                case R.id.edt_content_todo:
+                    updateContentTodo();
+                    return false;
+                case R.id.edt_content_children:
+                    updateChildren();
+                    return true;
+            }
+        }
+        return false;
+    }
+
+
+    @Override
+    public void onVisibilityChanged(boolean b) {
+        if (b) {
+            clickDone = false;
+        } else {
+            if (!clickDone) {
+                updateContentTodo();
+                updateChildren();
+            }
+        }
+        View view = getCurrentFocus();
+        if (view != null) {
+            view.clearFocus();
+        }
+    }
+
+    private void updateContentTodo() {
+        String content = edtContent.getText().toString();
+        if (content.isEmpty()) {
+            edtContent.setText(todo.getContent());
+        } else {
+            todo.setContent(content);
+            todoDao.updateTodo(todo);
+        }
+        View view = getCurrentFocus();
+        if (view != null) {
+            view.clearFocus();
+        }
+    }
+
+    private void updateChildren() {
+        ArrayList<Map<String, Object>> children = todo.getChildrenTodo();
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        String contentChildren = edtContentChildren.getText().toString();
+        if (contentChildren.isEmpty()) {
+            return;
+        }
+        ChildrenTodo childrenTodo = new ChildrenTodo(false, contentChildren);
+        children.add(childrenTodo.toMap());
+        todo.setChildrenTodo(children);
+        todoDao.updateTodo(todo);
+        edtContentChildren.setText("");
+    }
+
+    @Override
+    public void onClickRemoveChildren(int position) {
+        deleteChildren(position);
+    }
+
+    @Override
+    public void onClickUpdateChildren(int position, String s) {
+        Map<String, Object> map = todo.getChildrenTodo().get(position);
+        map.put("content", s);
+        todoDao.updateTodo(todo);
+//        Log.e(this.getClass().getName(), "onClickUpdateChildren: ");
+    }
+
+    @Override
+    public void onClickCheck(int position) {
+        Map<String, Object> map = todo.getChildrenTodo().get(position);
+        map.put("isDone", !(boolean) map.get("isDone"));
+        todoDao.updateTodo(todo);
+    }
+
+    private void deleteChildren(int position) {
+        todo.getChildrenTodo().remove(position);
+        todoDao.updateTodo(todo);
+    }
+
+    private void swipeRecyclerView(RecyclerView recyclerView) {
+        ItemTouchHelper.SimpleCallback simpleCallbackDelete =
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        todo.getChildrenTodo().remove(viewHolder.getAdapterPosition());
+                        todoDao.updateTodo(todo);
+                    }
+
+                    @Override
+                    public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                                            float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                        new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                                .addSwipeLeftActionIcon(R.drawable.ic_delete)
+                                .addSwipeLeftBackgroundColor(ContextCompat.getColor(DetailTodoActivity.this, R.color.colorDanger))
+                                .setSwipeLeftLabelColor(DetailTodoActivity.this.getResources().getColor(R.color.colorWhite, null))
+                                .create()
+                                .decorate();
+                        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                    }
+                };
+
+        new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(recyclerView);
     }
 }
