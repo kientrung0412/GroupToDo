@@ -1,6 +1,6 @@
 package com.hanabi.todoapp;
 
- import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -92,9 +92,27 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
 
     private void realtimeUpdate() {
         todoDao.realtimeUpdateTodo(todo.getId() + "");
-        todoDao.setRealTimeUpdate(todo -> {
-            this.todo = todo;
-            bindViews();
+        todoDao.setRealTimeUpdate(new TodoDao.OnRealTimeUpdate() {
+            @Override
+            public void todoUpdate(Todo todo) {
+                DetailTodoActivity.this.todo = todo;
+                bindViews();
+            }
+
+            @Override
+            public void add(Todo todo) {
+
+            }
+
+            @Override
+            public void remove(Todo todo) {
+
+            }
+
+            @Override
+            public void modified(Todo todo) {
+
+            }
         });
     }
 
@@ -189,7 +207,7 @@ public class DetailTodoActivity extends AppCompatActivity implements View.OnClic
     private void setProperty(TextView textView, String content) {
         textView.setTag(TAG_NOT_EMPTY);
         textView.setText(content);
-        if (textView.getId() != R.id.tv_set_time){
+        if (textView.getId() != R.id.tv_set_time) {
             textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_close, 0);
         }
         textView.setTextColor(getResources().getColor(R.color.colorPrimary, null));
