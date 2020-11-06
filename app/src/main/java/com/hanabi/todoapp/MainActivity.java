@@ -71,10 +71,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-//        setupWork();
+        setupWork();
         setupService();
-        TodoDao todoDao = new TodoDao();
-        todoDao.updeteTodoLoop();
     }
 
     private void setupService() {
@@ -89,10 +87,6 @@ public class MainActivity extends AppCompatActivity
         //Lặp lại
         PeriodicWorkRequest periodicWorkLoop =
                 new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 15, TimeUnit.MINUTES)
-                        .setBackoffCriteria(
-                                BackoffPolicy.LINEAR,
-                                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                                TimeUnit.MILLISECONDS)
                         .build();
 
         //Lấy danh sách nhắc nhở

@@ -71,6 +71,50 @@ public class LoopTodo {
         this.weeks = weeks;
     }
 
+    public int getDays() {
+        return days;
+    }
+
+    public int getWeeks() {
+        return weeks;
+    }
+
+    public int getMonths() {
+        return months;
+    }
+
+    public int getYears() {
+        return years;
+    }
+
+    public Boolean getMonday() {
+        return monday;
+    }
+
+    public Boolean getTuesday() {
+        return tuesday;
+    }
+
+    public Boolean getWednesday() {
+        return wednesday;
+    }
+
+    public Boolean getThursday() {
+        return thursday;
+    }
+
+    public Boolean getFriday() {
+        return friday;
+    }
+
+    public Boolean getSaturday() {
+        return saturday;
+    }
+
+    public Boolean getSunday() {
+        return sunday;
+    }
+
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("days", days);

@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.hanabi.todoapp.models.LoopTodo;
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.utils.ManagerDate;
 
@@ -118,102 +119,72 @@ public class TodoDao {
                     if (queryDocumentSnapshots.isEmpty()) {
                         return;
                     }
+                    Calendar cal = Calendar.getInstance();
 
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                         Todo todo = document.toObject(Todo.class);
-                        Calendar cal = Calendar.getInstance();
 
-//                        if (todo.getCompletedDate() != null) {
-//                            managerDate.isEqualDay(todo.getCompletedDate(), calendar.getTime());
-//                            return;
-//                        }
-
-                        Map<String, Object> map = todo.getLoopTodoMap();
-                        cal.setTime(todo.getCreatedAt());
-
-                        int days = Integer.parseInt(map.get("days").toString());
-                        int weeks = Integer.parseInt(map.get("weeks").toString());
-                        int months = Integer.parseInt(map.get("months").toString());
-                        int years = Integer.parseInt(map.get("years").toString());
-                        boolean monday = Boolean.parseBoolean(String.valueOf(map.get("monday")));
-                        boolean tuesday = Boolean.parseBoolean(String.valueOf(map.get("tuesday")));
-                        boolean wednesday = Boolean.parseBoolean(String.valueOf(map.get("wednesday")));
-                        boolean thursday = Boolean.parseBoolean(String.valueOf(map.get("thursday")));
-                        boolean friday = Boolean.parseBoolean(String.valueOf(map.get("friday")));
-                        boolean saturday = Boolean.parseBoolean(String.valueOf(map.get("saturday")));
-                        boolean sunday = Boolean.parseBoolean(String.valueOf(map.get("sunday")));
-
-                        if (days > 0 && days < 1) {
-                            resetTodo(todo);
-                            return;
-                        } else if (days > 1) {
-                            long diff = calendar.getTimeInMillis() - todo.getCreatedAt().getTime();
-                            int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-                            if (day % days == 0) {
-                                resetTodo(todo);
-                            }
-                            return;
+                        if (!todo.getLoop()  ) {
+                            continue;
                         }
 
-                        if (weeks > 0) {
+                        if (todo.getCompletedDate() != null) {
+                            managerDate.isEqualDay(todo.getCompletedDate(), calendar.getTime());
+                        }
+
+                        Map<String, Object> map = todo.getLoopTodoMap();
+                        LoopTodo loopTodo = LoopTodo.parse(map);
+
+                        cal.setTime(todo.getCreatedAt());
+
+                        if (loopTodo.getDays() == 1) {
+                            resetTodo(todo);
+                        } else if (loopTodo.getDays() > 1) {
+                            long diff = calendar.getTimeInMillis() - todo.getCreatedAt().getTime();
+                            int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+                            if (day % loopTodo.getDays() == 0) {
+                                resetTodo(todo);
+                            }
+                        } else if (loopTodo.getWeeks() > 0) {
 //                            long diff = calendarNow.getTimeInMillis() - todo.getCreatedAt().getTime();
 //                            int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 //                            if (day == days) {
-                            if (sunday) {
+                            if (loopTodo.getSunday()) {
                                 if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
                                     resetTodo(todo);
                                     return;
                                 }
-                            }
-                            if (monday) {
+                            } else if (loopTodo.getMonday()) {
                                 if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
                                     resetTodo(todo);
-                                    return;
                                 }
-                            }
-                            if (tuesday) {
+                            } else if (loopTodo.getTuesday()) {
                                 if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY) {
                                     resetTodo(todo);
-                                    return;
                                 }
-                            }
-                            if (wednesday) {
+                            } else if (loopTodo.getWednesday()) {
                                 if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
                                     resetTodo(todo);
-                                    return;
                                 }
-                            }
-                            if (thursday) {
+                            } else if (loopTodo.getThursday()) {
                                 if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY) {
                                     resetTodo(todo);
-                                    return;
                                 }
-                            }
-                            if (friday) {
+                            } else if (loopTodo.getFriday()) {
                                 if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
                                     resetTodo(todo);
-                                    return;
                                 }
-                            }
-                            if (saturday) {
+                            } else if (loopTodo.getSaturday()) {
                                 if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
                                     resetTodo(todo);
-                                    return;
                                 }
                             }
 //                            }
-                        }
-                        if (days == 1) {
-                            resetTodo(todo);
-                            return;
-                        }
-                        if (months > 0) {
+                        } else if (loopTodo.getMonths() > 0) {
                             if (cal.get(Calendar.DATE) == calendar.get(Calendar.DATE)) {
                                 resetTodo(todo);
                             }
-                        }
-
-                        if (years > 0) {
+                        } else if (loopTodo.getYears() > 0) {
                             if (cal.get(Calendar.DAY_OF_YEAR) == calendar.get(Calendar.DAY_OF_YEAR)) {
                                 resetTodo(todo);
                             }
