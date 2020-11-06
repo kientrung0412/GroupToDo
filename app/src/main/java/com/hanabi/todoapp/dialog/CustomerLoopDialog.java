@@ -97,7 +97,7 @@ public class CustomerLoopDialog implements OnClickListener, AdapterView.OnItemSe
                             loopTodo.setDays(number);
                             break;
                         case 1:
-                            loopTodo.setDays(number * 7);
+                            loopTodo.setWeeks(number);
                             break;
                         case 2:
                             loopTodo.setMonths(number);

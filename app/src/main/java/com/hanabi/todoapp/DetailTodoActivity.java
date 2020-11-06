@@ -20,6 +20,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -153,7 +154,7 @@ public class DetailTodoActivity extends AppCompatActivity
     }
 
     private void bindViews() {
-        if (todo.getChildrenTodo() != null ){
+        if (todo.getChildrenTodo() != null) {
             adapter.setData(todo.getChildrenTodo());
         }
         edtContent.setText(todo.getContent());
@@ -166,64 +167,8 @@ public class DetailTodoActivity extends AppCompatActivity
         //lặp
         if (todo.getLoop()) {
             Map<String, Object> map = todo.getLoopTodoMap();
-
-            String aboutTime = "";
-            String listDay = "";
-
-            int days = Integer.parseInt(map.get("days").toString());
-            int months = Integer.parseInt(map.get("months").toString());
-            int years = Integer.parseInt(map.get("years").toString());
-            boolean monday = Boolean.parseBoolean(String.valueOf(map.get("monday")));
-            boolean tuesday = Boolean.parseBoolean(String.valueOf(map.get("tuesday")));
-            boolean wednesday = Boolean.parseBoolean(String.valueOf(map.get("wednesday")));
-            boolean thursday = Boolean.parseBoolean(String.valueOf(map.get("thursday")));
-            boolean friday = Boolean.parseBoolean(String.valueOf(map.get("friday")));
-            boolean saturday = Boolean.parseBoolean(String.valueOf(map.get("saturday")));
-            boolean sunday = Boolean.parseBoolean(String.valueOf(map.get("sunday")));
-
-            if (days > 0) {
-                if (days % 7 == 0) {
-                    aboutTime = days / 7 + " tuần";
-
-                    if (monday) {
-                        listDay += "Thứ Hai, ";
-                    }
-                    if (tuesday) {
-                        listDay += "Thứ Ba, ";
-                    }
-                    if (wednesday) {
-                        listDay += "Thứ Tư, ";
-                    }
-                    if (thursday) {
-                        listDay += "Thứ Năm, ";
-                    }
-                    if (friday) {
-                        listDay += "Thứ Sáu, ";
-                    }
-                    if (saturday) {
-                        listDay += "Thứ Bảy, ";
-                    }
-                    if (sunday) {
-                        listDay += "Chủ Nhật, ";
-                    }
-
-                } else {
-                    aboutTime = days + " ngày";
-                }
-            }
-            if (months > 0) {
-                aboutTime = months + " tháng";
-            }
-            if (years > 0) {
-                aboutTime = years + " năm";
-            }
-
-
-            String loopStr = String.format("Lặp lại mỗi %s", aboutTime);
-            if (!listDay.isEmpty()) {
-                loopStr += " vào " + listDay.trim().substring(0, listDay.length() - 2);
-            }
-            setProperty(tvLoop, loopStr);
+            LoopTodo loopTodo = LoopTodo.parse(map);
+            setProperty(tvLoop, loopTodo.toString());
         }
 
         //ngày hiển thị
@@ -365,6 +310,7 @@ public class DetailTodoActivity extends AppCompatActivity
                 CustomerLoopDialog dialog = new CustomerLoopDialog(this);
                 dialog.show();
                 dialog.setListener(loopTodo -> {
+                    Toast.makeText(this, loopTodo.toString(), Toast.LENGTH_SHORT).show();
                     todo.setLoopTodoMap(loopTodo.toMap());
                     todoDao.updateTodo(todo);
                 });

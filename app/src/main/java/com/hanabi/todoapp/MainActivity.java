@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity
         workManager = WorkManager.getInstance(this);
         //Lặp lại
         PeriodicWorkRequest periodicWorkLoop =
-                new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.MINUTES, 15, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 15, TimeUnit.MINUTES)
                         .setBackoffCriteria(
                                 BackoffPolicy.LINEAR,
                                 OneTimeWorkRequest.MIN_BACKOFF_MILLIS,

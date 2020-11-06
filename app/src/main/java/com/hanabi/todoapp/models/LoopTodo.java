@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class LoopTodo {
 
     private int days;
+    private int weeks;
     private int months;
     private int years;
     private Boolean monday = false;
@@ -66,9 +67,14 @@ public class LoopTodo {
         this.sunday = sunday;
     }
 
+    public void setWeeks(int weeks) {
+        this.weeks = weeks;
+    }
+
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("days", days);
+        map.put("weeks", weeks);
         map.put("months", months);
         map.put("years", years);
         map.put("monday", monday);
@@ -83,6 +89,7 @@ public class LoopTodo {
 
     public void reset() {
         days = 0;
+        weeks = 0;
         months = 0;
         years = 0;
         monday = false;
@@ -100,39 +107,35 @@ public class LoopTodo {
         String listDay = "";
 
         if (days > 0) {
-            if (days % 7 == 0) {
-                aboutTime = days / 7 + " tuần";
+            aboutTime = days + " ngày";
+        } else if (weeks > 0) {
+            aboutTime = weeks + " tuần";
 
-                if (monday) {
-                    listDay += "Thứ Hai, ";
-                }
-                if (tuesday) {
-                    listDay += "Thứ Ba, ";
-                }
-                if (wednesday) {
-                    listDay += "Thứ Tư, ";
-                }
-                if (thursday) {
-                    listDay += "Thứ Năm, ";
-                }
-                if (friday) {
-                    listDay += "Thứ Sáu, ";
-                }
-                if (saturday) {
-                    listDay += "Thứ Bảy, ";
-                }
-                if (sunday) {
-                    listDay += "Chủ Nhật, ";
-                }
-
-            } else {
-                aboutTime = days + " ngày";
+            if (monday) {
+                listDay += "Thứ Hai, ";
             }
-        }
-        if (months > 0) {
+            if (tuesday) {
+                listDay += "Thứ Ba, ";
+            }
+            if (wednesday) {
+                listDay += "Thứ Tư, ";
+            }
+            if (thursday) {
+                listDay += "Thứ Năm, ";
+            }
+            if (friday) {
+                listDay += "Thứ Sáu, ";
+            }
+            if (saturday) {
+                listDay += "Thứ Bảy, ";
+            }
+            if (sunday) {
+                listDay += "Chủ Nhật, ";
+            }
+
+        } else if (months > 0) {
             aboutTime = months + " tháng";
-        }
-        if (years > 0) {
+        } else if (years > 0) {
             aboutTime = years + " năm";
         }
 
@@ -143,6 +146,23 @@ public class LoopTodo {
         }
 
         return loopStr;
+    }
+
+    public static LoopTodo parse(Map<String, Object> map) {
+        LoopTodo loopTodo = new LoopTodo();
+        loopTodo.setDays(Integer.parseInt("" + map.get("days")));
+        loopTodo.setWeeks(Integer.valueOf("" + map.get("weeks")));
+        loopTodo.setMonths(Integer.valueOf("" + map.get("months")));
+        loopTodo.setYears(Integer.valueOf("" + map.get("years")));
+        loopTodo.setMonday((Boolean) map.get("monday"));
+        loopTodo.setTuesday((Boolean) map.get("tuesday"));
+        loopTodo.setWednesday((Boolean) map.get("wednesday"));
+        loopTodo.setThursday((Boolean) map.get("thursday"));
+        loopTodo.setFriday((Boolean) map.get("friday"));
+        loopTodo.setSaturday((Boolean) map.get("saturday"));
+        loopTodo.setSunday((Boolean) map.get("sunday"));
+        return loopTodo;
+
     }
 
     public static void habit(Activity activity) {

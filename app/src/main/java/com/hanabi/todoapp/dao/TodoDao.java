@@ -132,6 +132,7 @@ public class TodoDao {
                         cal.setTime(todo.getCreatedAt());
 
                         int days = Integer.parseInt(map.get("days").toString());
+                        int weeks = Integer.parseInt(map.get("weeks").toString());
                         int months = Integer.parseInt(map.get("months").toString());
                         int years = Integer.parseInt(map.get("years").toString());
                         boolean monday = Boolean.parseBoolean(String.valueOf(map.get("monday")));
@@ -142,7 +143,10 @@ public class TodoDao {
                         boolean saturday = Boolean.parseBoolean(String.valueOf(map.get("saturday")));
                         boolean sunday = Boolean.parseBoolean(String.valueOf(map.get("sunday")));
 
-                        if (days > 1 && days % 7 != 0) {
+                        if (days > 0 && days < 1) {
+                            resetTodo(todo);
+                            return;
+                        } else if (days > 1) {
                             long diff = calendar.getTimeInMillis() - todo.getCreatedAt().getTime();
                             int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
                             if (day % days == 0) {
@@ -151,7 +155,7 @@ public class TodoDao {
                             return;
                         }
 
-                        if (days % 7 == 0) {
+                        if (weeks > 0) {
 //                            long diff = calendarNow.getTimeInMillis() - todo.getCreatedAt().getTime();
 //                            int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 //                            if (day == days) {
