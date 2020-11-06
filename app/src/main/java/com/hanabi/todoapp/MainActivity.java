@@ -35,10 +35,11 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.hanabi.todoapp.models.LoopTodo;
+import com.hanabi.todoapp.dao.TodoDao;
 import com.hanabi.todoapp.models.User;
 import com.hanabi.todoapp.service.RemindService;
 import com.hanabi.todoapp.works.LoopWork;
+import com.hanabi.todoapp.works.ManagerRemindWork;
 import com.hanabi.todoapp.works.RemindWork;
 
 import java.util.concurrent.TimeUnit;
@@ -70,8 +71,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-        setupWork();
+//        setupWork();
         setupService();
+        TodoDao todoDao = new TodoDao();
+        todoDao.updeteTodoLoop();
     }
 
     private void setupService() {
@@ -84,19 +87,25 @@ public class MainActivity extends AppCompatActivity
     private void setupWork() {
         workManager = WorkManager.getInstance(this);
         //Lặp lại
-//        LoopTodo.habit(this);
-
-        //Lấy danh sách nhắc nhở
-        PeriodicWorkRequest periodicWorkRemind =
-                new PeriodicWorkRequest.Builder(RemindWork.class, 1, TimeUnit.DAYS, 15, TimeUnit.MINUTES)
+        PeriodicWorkRequest periodicWorkLoop =
+                new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.MINUTES, 15, TimeUnit.MINUTES)
                         .setBackoffCriteria(
                                 BackoffPolicy.LINEAR,
                                 OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
                                 TimeUnit.MILLISECONDS)
                         .build();
 
-        workManager.enqueue(periodicWorkRemind);
+        //Lấy danh sách nhắc nhở
+//        PeriodicWorkRequest periodicWorkRemind =
+//                new PeriodicWorkRequest.Builder(ManagerRemindWork.class, 1, TimeUnit.MINUTES, 15, TimeUnit.MINUTES)
+//                        .setBackoffCriteria(
+//                                BackoffPolicy.LINEAR,
+//                                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+//                                TimeUnit.MILLISECONDS)
+//                        .build();
 
+//        workManager.enqueue(periodicWorkRemind);
+        workManager.enqueue(periodicWorkLoop);
     }
 
 

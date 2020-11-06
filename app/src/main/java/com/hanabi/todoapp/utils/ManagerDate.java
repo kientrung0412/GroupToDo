@@ -7,7 +7,7 @@ import java.time.DayOfWeek;
 import java.util.Calendar;
 import java.util.Date;
 
-public class ManageDate {
+public class ManagerDate {
 
     private Calendar cal = Calendar.getInstance();
 

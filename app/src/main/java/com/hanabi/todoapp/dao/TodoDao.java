@@ -4,20 +4,15 @@ import android.app.Activity;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.models.Todo;
+import com.hanabi.todoapp.utils.ManagerDate;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,15 +22,18 @@ import java.util.concurrent.TimeUnit;
 
 public class TodoDao {
 
+    public static final String TAG = TodoDao.class.getName();
+
     public static ArrayList<Todo> todos;
 
-    private Calendar calendarNow = Calendar.getInstance();
+    private Calendar calendar = Calendar.getInstance();
     private Activity activity;
     private DataChangeListener listener;
     private RemindTodoListener reminderListener;
     private CollectionReference reference;
     private FirebaseUser firebaseUser;
     private OnRealTimeUpdate realTimeUpdate;
+    private ManagerDate managerDate;
 
     public TodoDao() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -125,14 +123,10 @@ public class TodoDao {
                         Todo todo = document.toObject(Todo.class);
                         Calendar cal = Calendar.getInstance();
 
-                        if (todo.getCompletedDate() != null) {
-                            cal.setTime(todo.getCompletedDate());
-                            if (cal.get(Calendar.YEAR) == calendarNow.get(Calendar.YEAR)
-                                    && cal.get(Calendar.MONTH) == calendarNow.get(Calendar.MONTH)
-                                    && cal.get(Calendar.DATE) == calendarNow.get(Calendar.DATE)) {
-                                return;
-                            }
-                        }
+//                        if (todo.getCompletedDate() != null) {
+//                            managerDate.isEqualDay(todo.getCompletedDate(), calendar.getTime());
+//                            return;
+//                        }
 
                         Map<String, Object> map = todo.getLoopTodoMap();
                         cal.setTime(todo.getCreatedAt());
@@ -149,7 +143,7 @@ public class TodoDao {
                         boolean sunday = Boolean.parseBoolean(String.valueOf(map.get("sunday")));
 
                         if (days > 1 && days % 7 != 0) {
-                            long diff = calendarNow.getTimeInMillis() - todo.getCreatedAt().getTime();
+                            long diff = calendar.getTimeInMillis() - todo.getCreatedAt().getTime();
                             int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
                             if (day % days == 0) {
                                 resetTodo(todo);
@@ -162,62 +156,61 @@ public class TodoDao {
 //                            int day = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 //                            if (day == days) {
                             if (sunday) {
-                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 1) {
+                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
                                     resetTodo(todo);
                                     return;
                                 }
                             }
                             if (monday) {
-                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 2) {
+                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
                                     resetTodo(todo);
                                     return;
                                 }
                             }
                             if (tuesday) {
-                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 3) {
+                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY) {
                                     resetTodo(todo);
                                     return;
                                 }
                             }
                             if (wednesday) {
-                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 4) {
+                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
                                     resetTodo(todo);
                                     return;
                                 }
                             }
                             if (thursday) {
-                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 5) {
+                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY) {
                                     resetTodo(todo);
                                     return;
                                 }
                             }
                             if (friday) {
-                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 6) {
+                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) {
                                     resetTodo(todo);
                                     return;
                                 }
                             }
                             if (saturday) {
-                                if (calendarNow.get(Calendar.DAY_OF_WEEK) == 7) {
+                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
                                     resetTodo(todo);
                                     return;
                                 }
                             }
-                            if (days == 1) {
-                                resetTodo(todo);
-                                return;
-                            }
 //                            }
                         }
-
+                        if (days == 1) {
+                            resetTodo(todo);
+                            return;
+                        }
                         if (months > 0) {
-                            if (cal.get(Calendar.DATE) == calendarNow.get(Calendar.DATE)) {
+                            if (cal.get(Calendar.DATE) == calendar.get(Calendar.DATE)) {
                                 resetTodo(todo);
                             }
                         }
 
                         if (years > 0) {
-                            if (cal.get(Calendar.DAY_OF_YEAR) == calendarNow.get(Calendar.DAY_OF_YEAR)) {
+                            if (cal.get(Calendar.DAY_OF_YEAR) == calendar.get(Calendar.DAY_OF_YEAR)) {
                                 resetTodo(todo);
                             }
                         }
@@ -345,7 +338,7 @@ public class TodoDao {
 
     private void resetTodo(Todo todo) {
         todo.setStatus(Todo.TODO_STATUS_NEW);
-        todo.setCreatedAt(calendarNow.getTime());
+        todo.setCreatedAt(calendar.getTime());
         updateTodo(todo);
     }
 

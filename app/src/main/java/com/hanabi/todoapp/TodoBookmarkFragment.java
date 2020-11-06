@@ -17,12 +17,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hanabi.todoapp.adapter.MyTodoAdapter;
 import com.hanabi.todoapp.dao.TodoDao;
+import com.hanabi.todoapp.dialog.FormTodoBottomSheetDialog;
 import com.hanabi.todoapp.models.Todo;
-import com.hanabi.todoapp.utils.ManageDate;
+import com.hanabi.todoapp.utils.ManagerDate;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,16 +32,18 @@ import java.util.Date;
 
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTimeUpdate, TodoDao.DataChangeListener, SwipeRefreshLayout.OnRefreshListener, MyTodoAdapter.OnClickMyTodoListener {
+public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTimeUpdate, TodoDao.DataChangeListener, SwipeRefreshLayout.OnRefreshListener, MyTodoAdapter.OnClickMyTodoListener, View.OnClickListener {
 
+    public static final String TAG = TodoBookmarkFragment.class.getClass().getName();
     public final String title = "Quan trọng";
 
     private TodoDao todoDao;
     private MyTodoAdapter adapter;
     private RecyclerView rcvBookmarks;
     private SwipeRefreshLayout srlReload;
+    private FloatingActionButton fabAdd;
 
-    private ManageDate manageDate = new ManageDate();
+    private ManagerDate managerDate = new ManagerDate();
     private Calendar calendar = Calendar.getInstance();
     private Date now = calendar.getTime();
 
@@ -61,6 +65,7 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
 
         adapter = new MyTodoAdapter(getLayoutInflater());
 
+        fabAdd = getActivity().findViewById(R.id.fab_add_todo_bookmark);
         srlReload = getActivity().findViewById(R.id.srl_reloading);
         rcvBookmarks = getActivity().findViewById(R.id.rcv_bookmark);
 
@@ -68,6 +73,7 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
         srlReload.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorPrimary, null));
         todoDao.setListener(this);
         adapter.setListener(this);
+        fabAdd.setOnClickListener(this);
         rcvBookmarks.setAdapter(adapter);
 
         swipeRecyclerView(rcvBookmarks, adapter);
@@ -207,5 +213,11 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
                 };
 
         new ItemTouchHelper(simpleCallbackDelete).attachToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public void onClick(View view) {
+        FormTodoBottomSheetDialog sheetDialog = new FormTodoBottomSheetDialog(true);
+        sheetDialog.show(getActivity().getSupportFragmentManager(), TAG);
     }
 }

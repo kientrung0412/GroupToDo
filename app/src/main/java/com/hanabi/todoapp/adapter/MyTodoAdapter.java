@@ -15,9 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.R;
+import com.hanabi.todoapp.utils.ManagerDate;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 
 public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTodo> {
 
@@ -25,6 +28,9 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
     private LayoutInflater layoutInflater;
     private ArrayList<Todo> data;
     private OnClickMyTodoListener listener;
+    private ManagerDate managerDate = new ManagerDate();
+    private Calendar calendar = Calendar.getInstance();
+    private Date now = calendar.getTime();
 
 
     public MyTodoAdapter(LayoutInflater layoutInflater) {
@@ -99,6 +105,12 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
         private void bindView(Todo todo) {
             tvContent.setText(todo.getContent());
+            if (managerDate.isEqualDay(now, todo.getCreatedAt())) {
+                tvTime.setText("Hôm nay");
+            } else {
+                tvContent.setText(managerDate.getDate(todo.getCreatedAt()).toString());
+            }
+
             if (todo.getLoop()) {
                 ivLoop.setVisibility(View.VISIBLE);
             } else {

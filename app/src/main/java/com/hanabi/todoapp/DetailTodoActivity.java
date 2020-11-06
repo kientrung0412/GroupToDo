@@ -20,7 +20,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -31,7 +30,7 @@ import com.hanabi.todoapp.dialog.RemindPickDateDialog;
 import com.hanabi.todoapp.models.ChildrenTodo;
 import com.hanabi.todoapp.models.LoopTodo;
 import com.hanabi.todoapp.models.Todo;
-import com.hanabi.todoapp.utils.ManageDate;
+import com.hanabi.todoapp.utils.ManagerDate;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
@@ -67,7 +66,7 @@ public class DetailTodoActivity extends AppCompatActivity
     private ChildrenTodoAdapter adapter;
 
     private Calendar calendar = Calendar.getInstance();
-    private ManageDate manageDate = new ManageDate();
+    private ManagerDate managerDate = new ManagerDate();
     private Date now = calendar.getTime();
     private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
     private DateFormat timeFormat = new SimpleDateFormat("HH:mm");
@@ -228,7 +227,7 @@ public class DetailTodoActivity extends AppCompatActivity
         }
 
         //ngày hiển thị
-        if (manageDate.isEqualDay(now, todo.getCreatedAt())) {
+        if (managerDate.isEqualDay(now, todo.getCreatedAt())) {
             setProperty(tvSetTime, "Hôm nay");
         } else {
             setProperty(tvSetTime, dateFormat.format(todo.getCreatedAt()));
@@ -236,7 +235,7 @@ public class DetailTodoActivity extends AppCompatActivity
 
         //Nhắc nhở
         if (todo.getRemindDate() != null) {
-            if (manageDate.isEqualDay(todo.getRemindDate(), now)) {
+            if (managerDate.isEqualDay(todo.getRemindDate(), now)) {
                 String time = timeFormat.format(todo.getRemindDate());
                 setProperty(tvRemind, "Nhắc tôi hôm nay lúc " + time + " giờ");
             } else {
@@ -294,8 +293,8 @@ public class DetailTodoActivity extends AppCompatActivity
                 MenuItem tomorrow = popupMenu.getMenu().findItem(R.id.it_tomorrow);
                 MenuItem nextTomorrow = popupMenu.getMenu().findItem(R.id.it_next_tomorrow);
                 MenuItem nextWeek = popupMenu.getMenu().findItem(R.id.it_next_week);
-                tomorrow.setTitle("Ngày mai (" + manageDate.getTomorrow(now) + ")");
-                nextTomorrow.setTitle("Ngày kia (" + manageDate.getNextTomorrow(now) + ")");
+                tomorrow.setTitle("Ngày mai (" + managerDate.getTomorrow(now) + ")");
+                nextTomorrow.setTitle("Ngày kia (" + managerDate.getNextTomorrow(now) + ")");
                 nextWeek.setTitle("Tuần sau (Thứ hai)");
                 popupMenu.setOnMenuItemClickListener(this);
                 popupMenu.show();
@@ -332,13 +331,13 @@ public class DetailTodoActivity extends AppCompatActivity
                 pickDateCreater();
                 break;
             case R.id.it_tomorrow:
-                todo.setCreatedAt(manageDate.getDateTomorrow(now));
+                todo.setCreatedAt(managerDate.getDateTomorrow(now));
                 break;
             case R.id.it_next_tomorrow:
-                todo.setCreatedAt(manageDate.getDateNextTomorrow(now));
+                todo.setCreatedAt(managerDate.getDateNextTomorrow(now));
                 break;
             case R.id.it_next_week:
-                todo.setCreatedAt(manageDate.getDateNextWeek(now));
+                todo.setCreatedAt(managerDate.getDateNextWeek(now));
                 break;
             case R.id.it_loop_day:
                 loopTodo.setDays(1);

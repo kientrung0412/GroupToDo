@@ -13,14 +13,10 @@ import java.util.concurrent.TimeUnit;
 
 public class Remind {
 
-    private WorkManager workManager;
     private RemindWork remindWork;
-    private Activity activity;
 
-    public Remind(Activity activity) {
-        this.activity = activity;
-        workManager = WorkManager.getInstance(activity);
-
+    public static void remindVeryDay(Activity activity) {
+        WorkManager workManager = WorkManager.getInstance(activity);
         PeriodicWorkRequest periodicWorkRemind =
                 new PeriodicWorkRequest.Builder(RemindWork.class, 1, TimeUnit.MINUTES, 15, TimeUnit.MINUTES)
                         .setBackoffCriteria(

@@ -10,7 +10,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +22,7 @@ import com.hanabi.todoapp.R;
 import com.hanabi.todoapp.dao.TodoDao;
 import com.hanabi.todoapp.models.LoopTodo;
 import com.hanabi.todoapp.models.Todo;
-import com.hanabi.todoapp.utils.ManageDate;
+import com.hanabi.todoapp.utils.ManagerDate;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -42,15 +41,23 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
 
     private PopupMenu popupMenu;
 
+    private Boolean bookmark = false;
     private Boolean isLoop = false;
     private Date remindDate, createdAt, now = null;
     private LoopTodo loopTodo = new LoopTodo();
-    private ManageDate manageDate;
+    private ManagerDate managerDate;
     private TodoDao todoDao;
     private InputMethodManager imm;
 
     private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
     private DateFormat dateTimeFormat = new SimpleDateFormat("dd/MM/yy HH:mm");
+
+    public FormTodoBottomSheetDialog() {
+    }
+
+    public FormTodoBottomSheetDialog(Boolean bookmark) {
+        this.bookmark = bookmark;
+    }
 
 
     @NonNull
@@ -65,7 +72,7 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
         cpRemind = view.findViewById(R.id.cp_set_remind);
         ivAdd = view.findViewById(R.id.iv_add_my_todo);
 
-        manageDate = new ManageDate();
+        managerDate = new ManagerDate();
         todoDao = new TodoDao();
         todoDao.setActivity(getActivity());
         now = calendar.getTime();
@@ -93,6 +100,7 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
                     return;
                 }
                 Todo todo = new Todo();
+                todo.setBookmark(bookmark);
                 todo.setContent(edtContent.getText().toString().trim());
                 todo.setStatus(Todo.TODO_STATUS_NEW);
                 if (createdAt != null) {
@@ -141,8 +149,8 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
                 MenuItem tomorrow = popupMenu.getMenu().findItem(R.id.it_tomorrow);
                 MenuItem nextTomorrow = popupMenu.getMenu().findItem(R.id.it_next_tomorrow);
                 MenuItem nextWeek = popupMenu.getMenu().findItem(R.id.it_next_week);
-                tomorrow.setTitle("Ngày mai (" + manageDate.getTomorrow(now) + ")");
-                nextTomorrow.setTitle("Ngày kia (" + manageDate.getNextTomorrow(now) + ")");
+                tomorrow.setTitle("Ngày mai (" + managerDate.getTomorrow(now) + ")");
+                nextTomorrow.setTitle("Ngày kia (" + managerDate.getNextTomorrow(now) + ")");
                 nextWeek.setTitle("Tuần sau (Thứ hai)");
                 popupMenu.setOnMenuItemClickListener(this);
                 popupMenu.show();
@@ -157,15 +165,15 @@ public class FormTodoBottomSheetDialog extends BottomSheetDialogFragment
                 pickDateCreater();
                 break;
             case R.id.it_tomorrow:
-                createdAt = manageDate.getDateTomorrow(now);
+                createdAt = managerDate.getDateTomorrow(now);
                 chipClick(cpTime, dateFormat.format(createdAt));
                 break;
             case R.id.it_next_tomorrow:
-                createdAt = manageDate.getDateNextTomorrow(now);
+                createdAt = managerDate.getDateNextTomorrow(now);
                 chipClick(cpTime, dateFormat.format(createdAt));
                 break;
             case R.id.it_next_week:
-                createdAt = manageDate.getDateNextWeek(now);
+                createdAt = managerDate.getDateNextWeek(now);
                 chipClick(cpTime, dateFormat.format(createdAt));
                 break;
             case R.id.it_loop_day:
