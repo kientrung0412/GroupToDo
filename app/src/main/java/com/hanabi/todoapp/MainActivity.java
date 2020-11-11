@@ -4,25 +4,36 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.work.BackoffPolicy;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,25 +43,25 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.hanabi.todoapp.dao.TodoDao;
+import com.hanabi.todoapp.dialog.SortBottomSheetDialog;
 import com.hanabi.todoapp.models.User;
-import com.hanabi.todoapp.service.RemindService;
+import com.hanabi.todoapp.service.TestService;
+import com.hanabi.todoapp.service.TodoService;
 import com.hanabi.todoapp.works.LoopWork;
-import com.hanabi.todoapp.works.ManagerRemindWork;
-import com.hanabi.todoapp.works.RemindWork;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, OnSuccessListener<Void>, OnFailureListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, OnSuccessListener<Void>, OnFailureListener, SortBottomSheetDialog.OnClickMenuListener {
     public static final int REQUEST_CODE_OFF = 1;
     public static final String EXTRA_DETAIL_TODO = "extra.DETAIL_TODO";
+    private static final String TAG = "MainActivity";
 
     private WorkManager workManager;
 
@@ -58,47 +69,88 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawerLayout;
     private NavigationView navigationViewl;
     private LinearLayout lnNavHeader;
+    private RelativeLayout rlHome;
 
     private TextView tvEmail, tvName;
     private CircleImageView civAvatar;
+    private TodoService service;
 
-    private ToDoFragment toDoFragment = new ToDoFragment();
-    private TodoBookmarkFragment bookmarkFragment = new TodoBookmarkFragment();
+    private SortBottomSheetDialog sortBottomSheetDialog;
+    private static ToDoFragment toDoFragment = new ToDoFragment(Calendar.getInstance().getTime());
+    private static AllTodoFragment allTodoFragment = new AllTodoFragment();
+    private static TodoBookmarkFragment bookmarkFragment = new TodoBookmarkFragment();
     private FirebaseMessaging fcm = FirebaseMessaging.getInstance();
+
+    private JobScheduler jobScheduler;
+
+    public static ToDoFragment getToDoFragment() {
+        return toDoFragment;
+    }
+
+    public static AllTodoFragment getAllTodoFragment() {
+        return allTodoFragment;
+    }
+
+    private int indexNav = R.id.it_today_todo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
+//        startJob();
         setupWork();
         setupService();
     }
 
+    private void startJob() {
+        jobScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+
+        ComponentName componentName = new ComponentName(this, TestService.class);
+        JobInfo jobInfo = new JobInfo.Builder(0412, componentName)
+                .setPeriodic(1000 * 60 * 15)
+                .setRequiresCharging(false)
+                .setPersisted(true)
+                .build();
+
+        if (jobScheduler.schedule(jobInfo) == JobScheduler.RESULT_SUCCESS) {
+            Log.e(TAG, "startJob: " + "s");
+        } else {
+            Log.e(TAG, "startJob: " + "f");
+        }
+
+    }
+
     private void setupService() {
-//        Intent intent = new Intent(this, RemindService.class);
-//        startService(intent);
+        Intent intent = new Intent(this, TodoService.class);
+        startService(intent);
+        bindService(intent, connection, BIND_AUTO_CREATE);
+
         fcm.subscribeToTopic("demo").addOnSuccessListener(this).addOnFailureListener(this);
     }
 
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            TodoService.TodoBinder binder = (TodoService.TodoBinder) iBinder;
+            service = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Toast.makeText(service, "error", Toast.LENGTH_SHORT).show();
+        }
+    };
 
     private void setupWork() {
         workManager = WorkManager.getInstance(this);
-        //Lặp lại
         PeriodicWorkRequest periodicWorkLoop =
-                new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 15, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 10, TimeUnit.MINUTES)
+                        .setBackoffCriteria(
+                                BackoffPolicy.LINEAR,
+                                PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
+                                TimeUnit.MILLISECONDS)
                         .build();
-
-        //Lấy danh sách nhắc nhở
-//        PeriodicWorkRequest periodicWorkRemind =
-//                new PeriodicWorkRequest.Builder(ManagerRemindWork.class, 1, TimeUnit.MINUTES, 15, TimeUnit.MINUTES)
-//                        .setBackoffCriteria(
-//                                BackoffPolicy.LINEAR,
-//                                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-//                                TimeUnit.MILLISECONDS)
-//                        .build();
-
-//        workManager.enqueue(periodicWorkRemind);
         workManager.enqueue(periodicWorkLoop);
     }
 
@@ -107,9 +159,12 @@ public class MainActivity extends AppCompatActivity
         Intent intent = getIntent();
         User user = (User) intent.getSerializableExtra(LoginActivity.EXTRA_USER);
         setTitle(toDoFragment.getTitleToolBar());
+        sortBottomSheetDialog = new SortBottomSheetDialog(this, this);
         toolbar = findViewById(R.id.tb_main);
         drawerLayout = findViewById(R.id.dl_main);
         navigationViewl = findViewById(R.id.nav_view);
+        rlHome = findViewById(R.id.rl_home);
+
         lnNavHeader = navigationViewl.getHeaderView(0).findViewById(R.id.ln_nav_header);
         tvEmail = lnNavHeader.findViewById(R.id.tv_email);
         tvName = lnNavHeader.findViewById(R.id.tv_name);
@@ -129,10 +184,12 @@ public class MainActivity extends AppCompatActivity
         showFragment(toDoFragment);
     }
 
+
     private void initFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fl_main, toDoFragment);
         transaction.add(R.id.fl_main, bookmarkFragment);
+        transaction.add(R.id.fl_main, allTodoFragment);
         transaction.commit();
     }
 
@@ -140,6 +197,7 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.hide(toDoFragment);
         transaction.hide(bookmarkFragment);
+        transaction.hide(allTodoFragment);
         transaction.show(fragment);
         transaction.commit();
     }
@@ -152,12 +210,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-
-//        if (myToDoFragment.getLlAddTodo().getVisibility() == View.VISIBLE) {
-//            myToDoFragment.getLlAddTodo().setVisibility(View.GONE);
-//            myToDoFragment.getFabAdd().setVisibility(View.VISIBLE);
-//            return;
-//        }
 
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -172,10 +224,17 @@ public class MainActivity extends AppCompatActivity
             case R.id.it_today_todo:
                 showFragment(toDoFragment);
                 setTitle(toDoFragment.getTitleToolBar());
+                indexNav = R.id.it_today_todo;
                 break;
             case R.id.it_bookmark_todo:
                 showFragment(bookmarkFragment);
-                setTitle(bookmarkFragment.getTitle());
+                setTitle(bookmarkFragment.getTitleToolBar());
+                indexNav = R.id.it_bookmark_todo;
+                break;
+            case R.id.it_list_todo:
+                showFragment(allTodoFragment);
+                setTitle(allTodoFragment.getTitleToolBar());
+                indexNav = R.id.it_list_todo;
                 break;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -216,7 +275,67 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.it_sort:
+                sortBottomSheetDialog.show();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public void clickDate() {
+        switch (indexNav) {
+            case R.id.it_today_todo:
+                toDoFragment.getAdapterNew().sortByCreatedAt();
+                toDoFragment.getAdapterDone().sortByCreatedAt();
+                break;
+            case R.id.it_bookmark_todo:
+                bookmarkFragment.getAdapter().sortByCreatedAt();
+                break;
+            case R.id.it_list_todo:
+                allTodoFragment.getAdapterDone().sortByCreatedAt();
+                allTodoFragment.getAdapterNew().sortByCreatedAt();
+                break;
+        }
+    }
+
+    @Override
+    public void clickBookmark() {
+        switch (indexNav) {
+            case R.id.it_today_todo:
+                toDoFragment.getAdapterNew().sortByBookmark();
+                toDoFragment.getAdapterDone().sortByBookmark();
+                break;
+            case R.id.it_bookmark_todo:
+                bookmarkFragment.getAdapter().sortByBookmark();
+                break;
+            case R.id.it_list_todo:
+                allTodoFragment.getAdapterDone().sortByBookmark();
+                allTodoFragment.getAdapterNew().sortByBookmark();
+                break;
+        }
+    }
+
+    @Override
+    public void clickAZ() {
+        switch (indexNav) {
+            case R.id.it_today_todo:
+                toDoFragment.getAdapterNew().sortByContent();
+                toDoFragment.getAdapterDone().sortByContent();
+                break;
+            case R.id.it_bookmark_todo:
+                bookmarkFragment.getAdapter().sortByContent();
+                break;
+            case R.id.it_list_todo:
+                allTodoFragment.getAdapterDone().sortByContent();
+                allTodoFragment.getAdapterNew().sortByContent();
+                break;
+        }
     }
 }

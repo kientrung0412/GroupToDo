@@ -46,10 +46,18 @@
 
             <ImageView
                 android:id="@+id/iv_loop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginRight="16dp"
                 android:src="@drawable/ic_loop"
-                android:visibility="gone" />
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/iv_remind"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_bell"
+                android:visibility="visible" />
 
         </LinearLayout>
     </LinearLayout>

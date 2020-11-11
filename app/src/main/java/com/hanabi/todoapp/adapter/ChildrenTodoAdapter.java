@@ -2,6 +2,7 @@ package com.hanabi.todoapp.adapter;
 
 
 import android.app.Activity;
+import android.os.Build;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,11 +17,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.common.collect.Iterables;
 import com.hanabi.todoapp.R;
+import com.hanabi.todoapp.models.Todo;
 
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class ChildrenTodoAdapter extends RecyclerView.Adapter<ChildrenTodoAdapter.HolderChildrenTodo> {
 

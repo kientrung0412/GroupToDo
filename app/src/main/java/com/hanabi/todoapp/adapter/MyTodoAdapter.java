@@ -17,8 +17,12 @@ import com.hanabi.todoapp.models.Todo;
 import com.hanabi.todoapp.R;
 import com.hanabi.todoapp.utils.ManagerDate;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -26,7 +30,7 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
 
     private LayoutInflater layoutInflater;
-    private ArrayList<Todo> data;
+    private ArrayList<Todo> data = new ArrayList<>();
     private OnClickMyTodoListener listener;
     private ManagerDate managerDate = new ManagerDate();
     private Calendar calendar = Calendar.getInstance();
@@ -43,24 +47,47 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
     public void setData(ArrayList<Todo> data) {
         this.data = data;
-        notifyDataSetChanged();
+        sortByCreatedAt();
     }
 
     public ArrayList<Todo> getData() {
         return data;
     }
 
-    public void sortByCreatedAt() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            data.sort((t1, t2) -> (int) (t2.getId() - t1.getId()));
+    public void addItem(Todo todo) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Todo rs = data.stream().filter(td -> td.getId() == todo.getId()).findAny().orElse(null);
+            if (rs == null) {
+                data.add(todo);
+            }
         }
+    }
+
+    public void addItem(int index, Todo todo) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Todo rs = data.stream().filter(td -> td.getId() == todo.getId()).findAny().orElse(null);
+            if (rs == null) {
+                data.add(index, todo);
+            } else {
+                rs.toEquals(todo);
+                data.add(rs);
+            }
+        }
+    }
+
+    public void sortByCreatedAt() {
+        Collections.sort(data, (t1, t2) -> (int) (t2.getId() - t1.getId()));
         notifyDataSetChanged();
     }
 
     public void sortByBookmark() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            data.sort((t1, t2) -> Boolean.compare(t2.getBookmark(), t1.getBookmark()));
-        }
+        Collections.sort(data, (t1, t2) -> Boolean.compare(t2.getBookmark(), t1.getBookmark()));
+        notifyDataSetChanged();
+    }
+
+    public void sortByContent() {
+        Collections.sort(data, (t1, t2) -> t1.getContent().compareTo(t2.getContent()));
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -90,14 +117,16 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
 
     public class HolderMyTodo extends RecyclerView.ViewHolder {
 
+        private DateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
         private TextView tvContent, tvTime;
         private CheckBox cbDone, cbStar;
-        private ImageView ivLoop;
+        private ImageView ivLoop, ivRemind;
 
         public HolderMyTodo(@NonNull View itemView) {
             super(itemView);
             tvContent = itemView.findViewById(R.id.edt_content_todo);
             ivLoop = itemView.findViewById(R.id.iv_loop);
+            ivRemind = itemView.findViewById(R.id.iv_remind);
             cbStar = itemView.findViewById(R.id.cb_bookmark);
             tvTime = itemView.findViewById(R.id.tv_todo_create_at);
             cbDone = itemView.findViewById(R.id.cb_done);
@@ -108,13 +137,19 @@ public class MyTodoAdapter extends RecyclerView.Adapter<MyTodoAdapter.HolderMyTo
             if (managerDate.isEqualDay(now, todo.getCreatedAt())) {
                 tvTime.setText("Hôm nay");
             } else {
-                tvContent.setText(managerDate.getDate(todo.getCreatedAt()).toString());
+                tvTime.setText(dateFormat.format(todo.getCreatedAt()));
             }
 
             if (todo.getLoop()) {
                 ivLoop.setVisibility(View.VISIBLE);
             } else {
                 ivLoop.setVisibility(View.GONE);
+            }
+
+            if (todo.getRemindDate() != null) {
+                ivRemind.setVisibility(View.VISIBLE);
+            } else {
+                ivRemind.setVisibility(View.GONE);
             }
 
             cbStar.setChecked(todo.getBookmark());

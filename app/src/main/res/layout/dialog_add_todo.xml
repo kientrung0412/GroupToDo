@@ -27,17 +27,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:paddingHorizontal="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
                 android:text="Nhắc nhở"
                 android:textSize="12sp"
-                app:chipIcon="@drawable/ic_bell_color" />
+                app:chipIcon="@drawable/ic_bell" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/cp_set_time_todo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:paddingHorizontal="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
                 android:text="Đặt lịch"
                 android:textSize="12sp"
                 app:chipIcon="@drawable/ic_calendar" />
@@ -47,7 +49,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:paddingHorizontal="8dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
                 android:text="Lặp lại"
                 android:textSize="12sp"
                 app:chipIcon="@drawable/ic_loop" />
@@ -63,7 +66,6 @@
         android:orientation="horizontal">
 
         <EditText
-            android:imeOptions="actionDone"
             android:id="@+id/edt_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -73,6 +75,7 @@
             android:background="@drawable/btn_bg_default"
             android:focusedByDefault="true"
             android:hint="Công việc"
+            android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:lineHeight="21sp"
             android:padding="8dp"

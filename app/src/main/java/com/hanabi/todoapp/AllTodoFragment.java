@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,20 +32,17 @@ import com.hanabi.todoapp.adapter.MyTodoAdapter;
 import com.hanabi.todoapp.dao.TodoDao;
 import com.hanabi.todoapp.dialog.FormTodoBottomSheetDialog;
 import com.hanabi.todoapp.models.Todo;
-import com.hanabi.todoapp.utils.ManagerDate;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 
-public class ToDoFragment extends Fragment
-        implements View.OnClickListener, MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, TodoDao.DataChangeListener, TodoDao.OnRealTimeUpdate {
+public class AllTodoFragment extends Fragment implements TodoDao.OnRealTimeUpdate, View.OnClickListener, MyTodoAdapter.OnClickMyTodoListener, SwipeRefreshLayout.OnRefreshListener, TodoDao.DataChangeListener {
 
-    public static final String TAG = ToDoFragment.class.getName();
-    private String titleToolBar = "Hôm nay";
+    public static final String TAG = AllTodoFragment.class.getName();
+    private String titleToolBar = "Tất cả tác vụ";
 
     private RecyclerView rcvTodoNew, rcvTodoDone;
     private MyTodoAdapter adapterNew, adapterDone;
@@ -54,9 +52,8 @@ public class ToDoFragment extends Fragment
     private LinearLayout llMore;
     private TextView tvCountDone;
 
-    private ManagerDate managerDate = new ManagerDate();
     private Calendar calendar = Calendar.getInstance();
-    private Date now;
+    private Date now = calendar.getTime();
 
     private TodoDao todoDao = new TodoDao();
 
@@ -72,14 +69,10 @@ public class ToDoFragment extends Fragment
         return adapterNew;
     }
 
-    public ToDoFragment(Date now) {
-        this.now = now;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_todo, container, false);
+        return inflater.inflate(R.layout.fragment_all_todo, container, false);
     }
 
     @Override
@@ -88,12 +81,12 @@ public class ToDoFragment extends Fragment
         setHasOptionsMenu(true);
 
         todoDao.setContext(getActivity());
-        tvCountDone = getActivity().findViewById(R.id.tv_count_done);
-        rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new);
-        rcvTodoDone = getActivity().findViewById(R.id.rcv_my_todo_done);
-        srlReload = getActivity().findViewById(R.id.srl_loading_my_todo);
-        fabAdd = getActivity().findViewById(R.id.fab_add_todo);
-        llMore = getActivity().findViewById(R.id.ll_more);
+        tvCountDone = getActivity().findViewById(R.id.tv_count_done_all);
+        rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new_all);
+        rcvTodoDone = getActivity().findViewById(R.id.rcv_my_todo_done_all);
+        srlReload = getActivity().findViewById(R.id.srl_loading_todo_all);
+        fabAdd = getActivity().findViewById(R.id.fab_add_todo_all);
+        llMore = getActivity().findViewById(R.id.ll_more_all);
 
         adapterNew = new MyTodoAdapter(getLayoutInflater());
         adapterDone = new MyTodoAdapter(getLayoutInflater());
@@ -104,7 +97,6 @@ public class ToDoFragment extends Fragment
         rcvTodoDone.setNestedScrollingEnabled(false);
 
         llMore.setOnClickListener(this);
-
         adapterNew.setListener(this);
         adapterDone.setListener(this);
         fabAdd.setOnClickListener(this);
@@ -121,14 +113,14 @@ public class ToDoFragment extends Fragment
     }
 
     private void realtimeUpdate() {
-        todoDao.realtimeUpdate(managerDate.getDate(managerDate.getDateTomorrow(now)), managerDate.getDate(now), Todo.TODO_STATUS_NEW, Todo.BOOKMARK_NONE);
-        todoDao.realtimeUpdate(managerDate.getDate(managerDate.getDateTomorrow(now)), managerDate.getDate(now), Todo.TODO_STATUS_DONE, Todo.BOOKMARK_NONE);
+        todoDao.realtimeUpdate(null, null, Todo.TODO_STATUS_NEW, Todo.BOOKMARK_NONE);
+        todoDao.realtimeUpdate(null, null, Todo.TODO_STATUS_DONE, Todo.BOOKMARK_NONE);
         todoDao.setRealTimeUpdate(this);
     }
 
     private void loadingData() {
-        todoDao.getTodos(managerDate.getDate(managerDate.getDateTomorrow(now)), managerDate.getDate(now), Todo.TODO_STATUS_NEW, Todo.BOOKMARK_NONE);
-        todoDao.getTodos(managerDate.getDate(managerDate.getDateTomorrow(now)), managerDate.getDate(now), Todo.TODO_STATUS_DONE, Todo.BOOKMARK_NONE);
+        todoDao.getTodos(null, null, Todo.TODO_STATUS_NEW, Todo.BOOKMARK_NONE);
+        todoDao.getTodos(null, null, Todo.TODO_STATUS_DONE, Todo.BOOKMARK_NONE);
     }
 
     @Override
@@ -141,11 +133,11 @@ public class ToDoFragment extends Fragment
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.fab_add_todo:
+            case R.id.fab_add_todo_all:
                 FormTodoBottomSheetDialog sheetDialog = new FormTodoBottomSheetDialog();
                 sheetDialog.show(getActivity().getSupportFragmentManager(), TAG);
                 break;
-            case R.id.ll_more:
+            case R.id.ll_more_all:
                 if (rcvTodoDone.getVisibility() == View.VISIBLE) {
                     rcvTodoDone.setVisibility(View.GONE);
                     return;
@@ -292,8 +284,6 @@ public class ToDoFragment extends Fragment
                 adapterNew.sortByCreatedAt();
                 break;
         }
-
-
         toggleMore();
     }
 
@@ -332,7 +322,6 @@ public class ToDoFragment extends Fragment
                     todoModified.toEquals(todo);
                     adapterDone.notifyDataSetChanged();
                 }
-
                 break;
             case Todo.TODO_STATUS_NEW:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

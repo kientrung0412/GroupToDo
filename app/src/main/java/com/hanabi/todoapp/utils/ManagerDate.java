@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class ManagerDate {
 
@@ -37,18 +38,27 @@ public class ManagerDate {
     }
 
     public Date getDateTomorrow(Date date) {
+        if (date == null) {
+            return null;
+        }
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
         return cal.getTime();
     }
 
     public Date getDateNextTomorrow(Date date) {
+        if (date == null) {
+            return null;
+        }
         cal.setTime(date);
         cal.add(Calendar.DATE, 2);
         return cal.getTime();
     }
 
     public Date getDateNextWeek(Date date) {
+        if (date == null) {
+            return null;
+        }
         cal.setTime(date);
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
 
@@ -69,6 +79,9 @@ public class ManagerDate {
     }
 
     public Date getDate(Date date) {
+        if (date == null){
+            return null;
+        }
         cal.setTime(date);
         String strNow = String.format("%s/%s/%s", cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR));
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -81,6 +94,10 @@ public class ManagerDate {
     }
 
     public boolean isEqualDay(Date date1, Date date2) {
+        if (date1 == null || date2 == null) {
+            return false;
+        }
+
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(date1);
         Calendar cal2 = Calendar.getInstance();
@@ -93,5 +110,10 @@ public class ManagerDate {
         }
 
         return false;
+    }
+
+    public int subtractionDays(Date date1, Date date2) {
+        long diff = date1.getTime() - date2.getTime();
+        return (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
 }

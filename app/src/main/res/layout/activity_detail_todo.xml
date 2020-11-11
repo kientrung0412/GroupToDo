@@ -135,9 +135,9 @@
                         android:paddingBottom="8dp">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_bell_color" />
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_bell" />
 
                         <TextView
                             android:id="@+id/tv_remind"
@@ -166,8 +166,8 @@
                         android:paddingBottom="8dp">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:src="@drawable/ic_loop" />
 
                         <TextView
@@ -197,8 +197,8 @@
                         android:paddingBottom="8dp">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
                             android:src="@drawable/ic_calendar" />
 
                         <TextView

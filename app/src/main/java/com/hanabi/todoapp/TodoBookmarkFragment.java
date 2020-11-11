@@ -24,7 +24,6 @@ import com.hanabi.todoapp.adapter.MyTodoAdapter;
 import com.hanabi.todoapp.dao.TodoDao;
 import com.hanabi.todoapp.dialog.FormTodoBottomSheetDialog;
 import com.hanabi.todoapp.models.Todo;
-import com.hanabi.todoapp.utils.ManagerDate;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,7 +34,7 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTimeUpdate, TodoDao.DataChangeListener, SwipeRefreshLayout.OnRefreshListener, MyTodoAdapter.OnClickMyTodoListener, View.OnClickListener {
 
     public static final String TAG = TodoBookmarkFragment.class.getClass().getName();
-    public final String title = "Quan trọng";
+    public final String titleToolBar = "Quan trọng";
 
     private TodoDao todoDao;
     private MyTodoAdapter adapter;
@@ -43,13 +42,17 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
     private SwipeRefreshLayout srlReload;
     private FloatingActionButton fabAdd;
 
-    private ManagerDate managerDate = new ManagerDate();
     private Calendar calendar = Calendar.getInstance();
     private Date now = calendar.getTime();
 
-    public String getTitle() {
-        return title;
+    public String getTitleToolBar() {
+        return titleToolBar;
     }
+
+    public MyTodoAdapter getAdapter() {
+        return adapter;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,7 +64,7 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         todoDao = new TodoDao();
-        todoDao.setActivity(getActivity());
+        todoDao.setContext(getActivity());
 
         adapter = new MyTodoAdapter(getLayoutInflater());
 
@@ -77,8 +80,6 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
         rcvBookmarks.setAdapter(adapter);
 
         swipeRecyclerView(rcvBookmarks, adapter);
-
-        loadingData();
         realtimeData();
     }
 
@@ -99,7 +100,7 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
     @Override
     public void add(Todo todo) {
         if (adapter.getData() != null) {
-            adapter.getData().add(0, todo);
+            adapter.addItem(todo);
             adapter.sortByCreatedAt();
         }
     }
@@ -139,7 +140,6 @@ public class TodoBookmarkFragment extends Fragment implements TodoDao.OnRealTime
         }
 //        setAnimation(rcvTodoNew);
         adapter.setData(todos);
-        Log.e(this.getTag(), todos.size() + "");
     }
 
     @Override
