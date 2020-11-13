@@ -1,5 +1,6 @@
 package com.hanabi.todoapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Build;
@@ -67,6 +68,13 @@ public class AllTodoFragment extends Fragment implements TodoDao.OnRealTimeUpdat
 
     public MyTodoAdapter getAdapterNew() {
         return adapterNew;
+    }
+
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
     }
 
     @Override

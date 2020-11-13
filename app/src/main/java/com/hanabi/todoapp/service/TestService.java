@@ -33,9 +33,9 @@ public class TestService extends JobService {
     private void doBackgroupWork() {
         todoDao = new TodoDao();
         Todo todo = new Todo();
-//        todo.setStatus(Todo.TODO_STATUS_NEW);
-//        todo.setContent(todo.getId() + "");
-//        todoDao.updateTodo(todo);
+        todo.setStatus(Todo.TODO_STATUS_NEW);
+        todo.setContent(todo.getCreatedAt().toString() + "");
+        todoDao.updateTodo(todo);
         pushNotification(todo);
     }
 

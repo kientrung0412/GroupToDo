@@ -39,7 +39,9 @@
                     android:background="@drawable/bg_more"
                     android:gravity="center"
                     android:paddingHorizontal="8dp"
-                    android:paddingVertical="8dp">
+                    android:paddingVertical="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         android:layout_width="wrap_content"

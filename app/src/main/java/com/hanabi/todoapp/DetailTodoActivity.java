@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,10 +56,11 @@ public class DetailTodoActivity extends AppCompatActivity
     private CheckBox cbBookmark;
     private EditText edtContentChildren, edtContent;
     private LinearLayout llAddChildren, llSetTime, llLoop, llRemind;
-    private TextView tvSetTime, tvLoop, tvRemind;
+    private TextView tvSetTime, tvLoop, tvRemind, tvCreateAt;
     private RecyclerView rcvChildren;
     private CheckBox cbStatus;
     private MaterialToolbar toolbar;
+    private ImageView ivDelete;
     private PopupMenu popupMenu;
     private Todo todo;
     private LoopTodo loopTodo = new LoopTodo();
@@ -102,7 +104,8 @@ public class DetailTodoActivity extends AppCompatActivity
         rcvChildren = findViewById(R.id.rcv_children_todo);
         cbStatus = findViewById(R.id.cb_status);
         toolbar = findViewById(R.id.tb_main);
-
+        tvCreateAt = findViewById(R.id.tv_create_at);
+        ivDelete = findViewById(R.id.iv_delete);
         setSupportActionBar(toolbar);
 
         edtContent.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -118,6 +121,7 @@ public class DetailTodoActivity extends AppCompatActivity
         llSetTime.setOnClickListener(this);
         cbStatus.setOnClickListener(this);
         cbBookmark.setOnClickListener(this);
+        ivDelete.setOnClickListener(this);
         toolbar.setNavigationOnClickListener(this);
 
         adapter.setListener(this, this);
@@ -163,6 +167,11 @@ public class DetailTodoActivity extends AppCompatActivity
         tvLoop.setTag(TAG_EMPTY);
         tvSetTime.setTag(TAG_EMPTY);
         cbBookmark.setChecked(todo.getBookmark());
+        if (managerDate.isEqualDay(now, todo.getCreatedAt())) {
+            tvCreateAt.setText("Hôm nay");
+        } else {
+            tvCreateAt.setText(dateFormat.format(todo.getCreatedAt()));
+        }
 
         //lặp
         if (todo.getLoop()) {
@@ -265,6 +274,10 @@ public class DetailTodoActivity extends AppCompatActivity
                     todo.setStatus(Todo.TODO_STATUS_NEW);
                 }
                 todoDao.updateTodo(todo);
+                break;
+            case R.id.iv_delete:
+                todoDao.deleteTodo(todo);
+                onBackPressed();
                 break;
         }
     }

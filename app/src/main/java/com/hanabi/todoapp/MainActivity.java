@@ -98,9 +98,9 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-//        startJob();
-        setupWork();
         setupService();
+        startJob();
+        setupWork();
     }
 
     private void startJob() {
@@ -108,17 +108,12 @@ public class MainActivity extends AppCompatActivity
 
         ComponentName componentName = new ComponentName(this, TestService.class);
         JobInfo jobInfo = new JobInfo.Builder(0412, componentName)
-                .setPeriodic(1000 * 60 * 15)
+                .setPeriodic(1000 * 60 * 5)
                 .setRequiresCharging(false)
                 .setPersisted(true)
                 .build();
 
-        if (jobScheduler.schedule(jobInfo) == JobScheduler.RESULT_SUCCESS) {
-            Log.e(TAG, "startJob: " + "s");
-        } else {
-            Log.e(TAG, "startJob: " + "f");
-        }
-
+        jobScheduler.schedule(jobInfo);
     }
 
     private void setupService() {
@@ -126,7 +121,7 @@ public class MainActivity extends AppCompatActivity
         startService(intent);
         bindService(intent, connection, BIND_AUTO_CREATE);
 
-        fcm.subscribeToTopic("demo").addOnSuccessListener(this).addOnFailureListener(this);
+//        fcm.subscribeToTopic("demo").addOnSuccessListener(this).addOnFailureListener(this);
     }
 
     private ServiceConnection connection = new ServiceConnection() {
@@ -145,7 +140,7 @@ public class MainActivity extends AppCompatActivity
     private void setupWork() {
         workManager = WorkManager.getInstance(this);
         PeriodicWorkRequest periodicWorkLoop =
-                new PeriodicWorkRequest.Builder(LoopWork.class, 1, TimeUnit.DAYS, 10, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(LoopWork.class, 4, TimeUnit.HOURS, 10, TimeUnit.MINUTES)
                         .setBackoffCriteria(
                                 BackoffPolicy.LINEAR,
                                 PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
@@ -337,5 +332,11 @@ public class MainActivity extends AppCompatActivity
                 allTodoFragment.getAdapterNew().sortByContent();
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
     }
 }

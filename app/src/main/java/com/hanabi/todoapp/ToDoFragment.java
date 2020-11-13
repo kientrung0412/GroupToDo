@@ -1,5 +1,6 @@
 package com.hanabi.todoapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Build;
@@ -17,8 +18,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,9 +53,10 @@ public class ToDoFragment extends Fragment
     private MyTodoAdapter adapterNew, adapterDone;
     private SwipeRefreshLayout srlReload;
     private FloatingActionButton fabAdd;
-
     private LinearLayout llMore;
     private TextView tvCountDone;
+    private ImageView ivArrowDown;
+    private Animation animation;
 
     private ManagerDate managerDate = new ManagerDate();
     private Calendar calendar = Calendar.getInstance();
@@ -88,6 +92,8 @@ public class ToDoFragment extends Fragment
         setHasOptionsMenu(true);
 
         todoDao.setContext(getActivity());
+        animation = AnimationUtils.loadAnimation(getContext(), R.anim.anim_rotate);
+        ivArrowDown = getActivity().findViewById(R.id.iv_arrow_down);
         tvCountDone = getActivity().findViewById(R.id.tv_count_done);
         rcvTodoNew = getActivity().findViewById(R.id.rcv_my_todo_new);
         rcvTodoDone = getActivity().findViewById(R.id.rcv_my_todo_done);
