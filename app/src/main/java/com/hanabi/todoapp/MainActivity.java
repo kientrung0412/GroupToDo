@@ -25,6 +25,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -43,6 +44,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.hanabi.todoapp.dao.TodoDao;
 import com.hanabi.todoapp.dialog.SortBottomSheetDialog;
@@ -68,9 +70,8 @@ public class MainActivity extends AppCompatActivity
     private MaterialToolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationViewl;
-    private LinearLayout lnNavHeader;
+    private LinearLayout lnNavHeader, llLogout;
     private RelativeLayout rlHome;
-
     private TextView tvEmail, tvName;
     private CircleImageView civAvatar;
     private TodoService service;
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         initViews();
         setupService();
-        startJob();
+//        startJob();
         setupWork();
     }
 
@@ -159,7 +160,7 @@ public class MainActivity extends AppCompatActivity
         drawerLayout = findViewById(R.id.dl_main);
         navigationViewl = findViewById(R.id.nav_view);
         rlHome = findViewById(R.id.rl_home);
-
+        llLogout = findViewById(R.id.ll_logout);
         lnNavHeader = navigationViewl.getHeaderView(0).findViewById(R.id.ln_nav_header);
         tvEmail = lnNavHeader.findViewById(R.id.tv_email);
         tvName = lnNavHeader.findViewById(R.id.tv_name);
@@ -173,6 +174,7 @@ public class MainActivity extends AppCompatActivity
         toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_baseline_more_vert_24, null));
         toolbar.setNavigationIcon(R.drawable.ic_baseline_menu_24);
         lnNavHeader.setOnClickListener(this);
+        llLogout.setOnClickListener(this);
         setSupportActionBar(toolbar);
         setupDrawer();
         initFragment();
@@ -240,9 +242,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.ln_nav_header:
-                Intent intent = new Intent(this, ProflieActivity.class);
-                startActivity(intent);
+            case R.id.ll_logout:
+                FirebaseAuth.getInstance().signOut();
+                Intent intentTodoService = new Intent(this, TodoService.class);
+                stopService(intentTodoService);
+                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                    finish();
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                }
                 break;
         }
     }

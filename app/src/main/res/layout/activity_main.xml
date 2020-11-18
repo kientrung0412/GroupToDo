@@ -47,7 +47,35 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        android:paddingVertical="8dp"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/menu_drawer" />
+        app:menu="@menu/menu_drawer">
+
+        <LinearLayout
+            android:id="@+id/ll_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:gravity="center"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_logout" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:text="Đăng xuất"
+                android:textColor="@color/colorDanger"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

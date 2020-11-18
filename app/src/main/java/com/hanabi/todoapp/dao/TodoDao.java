@@ -220,7 +220,7 @@ public class TodoDao {
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
-                        Toast.makeText(context, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "realtimeUpdate: " + e.getMessage());
                         return;
                     }
 
@@ -250,7 +250,7 @@ public class TodoDao {
         reference.document(todoId)
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
-                        Toast.makeText(context, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "realtimeUpdateTodo: " + error.getMessage());
                         return;
                     }
                     if (realTimeUpdate != null) {

@@ -28,4 +28,8 @@ public class LoadingDialog {
             dialog.dismiss();
         }
     }
+
+    public boolean isShowing() {
+        return dialog.isShowing();
+    }
 }

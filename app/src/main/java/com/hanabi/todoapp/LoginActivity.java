@@ -140,7 +140,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 firebaseAuthWithGoogle(account.getIdToken());
                 return;
             } catch (ApiException e) {
-                loadingDialog.dismissLoadingDialog();
+                if (loadingDialog.isShowing()) {
+                    loadingDialog.dismissLoadingDialog();
+                }
                 Toast.makeText(LoginActivity.this, getString(R.string.error_login_google) + " " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -168,7 +170,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         userDao.createUser(user);
                         updateUI(user);
                     } else {
-                        loadingDialog.dismissLoadingDialog();
+                        if (loadingDialog.isShowing()) {
+                            loadingDialog.dismissLoadingDialog();
+                        }
                         Toast.makeText(LoginActivity.this, getString(R.string.fall_login), Toast.LENGTH_SHORT).show();
                     }
 
